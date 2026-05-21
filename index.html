@@ -86,7 +86,8 @@ nav.on{background:rgba(8,8,8,.88);backdrop-filter:blur(18px);-webkit-backdrop-fi
   color:var(--muted);margin-bottom:1.5rem}
 .hero-h{font-size:clamp(3.5rem,7vw,7rem);font-weight:800;letter-spacing:-.045em;
   line-height:.95;margin-bottom:2rem}
-.hero-h .thin{font-weight:300;font-style:italic;color:var(--muted)}
+.hero-h .greet{font-weight:300;font-style:italic;color:var(--muted)}
+.hero-h .dot{color:var(--blue)}
 .hero-sub{font-size:clamp(.95rem,1.4vw,1.1rem);color:var(--muted);
   line-height:1.85;margin-bottom:2.5rem}
 .hero-sub a{color:var(--fg);border-bottom:1px solid rgba(255,255,255,.15);
@@ -140,19 +141,17 @@ hr.div{border:none;border-top:1px solid var(--border);position:relative;z-index:
 .empty{color:var(--muted);font-size:.85rem;padding:2.5rem 0}
 .empty code{background:rgba(255,255,255,.07);padding:.15rem .5rem;border-radius:5px;font-size:.8rem}
 
-/* ── BRANDS MARQUEE ── */
-#brands{padding:4rem 0}
-#brands .wrap{margin-bottom:2.5rem}
-.marquee-wrap{overflow:hidden;
-  -webkit-mask:linear-gradient(to right,transparent,black 12%,black 88%,transparent);
-  mask:linear-gradient(to right,transparent,black 12%,black 88%,transparent)}
-.mtrack{display:flex;gap:4rem;align-items:center;width:max-content;
-  animation:slide 32s linear infinite}
-.mtrack:hover{animation-play-state:paused}
-@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.brand-logo{height:38px;width:auto;max-width:130px;object-fit:contain;
-  opacity:.45;filter:invert(1) brightness(.85);transition:opacity .3s,filter .3s;flex-shrink:0}
-.brand-logo:hover{opacity:1;filter:invert(1) brightness(1)}
+/* ── BRANDS GRID ── */
+#brands{padding:5rem 0}
+.brand-grid{display:flex;flex-wrap:wrap;justify-content:center;
+  align-items:center;gap:3rem 5rem;margin-top:3rem}
+.brand-logo{height:44px;width:auto;max-width:160px;object-fit:contain;
+  opacity:.45;filter:invert(1) brightness(.9);
+  transition:opacity .3s,filter .3s,transform .3s}
+.brand-logo:hover{opacity:.9;filter:invert(1) brightness(1);transform:scale(1.06)}
+.brand-text{font-size:1.4rem;font-weight:600;color:var(--muted);opacity:.5;
+  letter-spacing:-.01em;transition:opacity .3s}
+.brand-text:hover{opacity:.9}
 
 /* ── ABOUT ── */
 .about-grid{display:grid;grid-template-columns:1fr 420px;gap:6rem;align-items:start}
@@ -295,11 +294,9 @@ footer p{font-size:.76rem;color:var(--muted)}
 <section id="brands">
   <div class="wrap">
     <p class="s-tag r">Clients</p>
-    <h2 class="s-h r">Brands I work with.</h2>
-  </div>
-  <div class="marquee-wrap">
-    <div class="mtrack" id="mtrack">
-      <span style="color:var(--muted);font-size:.85rem;padding:0 2rem">Loading brands…</span>
+    <h2 class="s-h r">Brands I worked with.</h2>
+    <div class="brand-grid r" id="mtrack">
+      <span style="color:var(--muted);font-size:.85rem">Loading…</span>
     </div>
   </div>
 </section>
@@ -482,7 +479,9 @@ async function loadWork() {
   }
 }
 
-/* ── Load brands (marquee) ── */
+/* ── Load brands (grid) ── */
+const FALLBACK_BRANDS = ['Bata','ME','EmailBoost','TURSIAN','Myanmar Sporting House','Ona Printing House'];
+
 async function loadBrands() {
   const track = document.getElementById('mtrack');
   try {
@@ -493,12 +492,12 @@ async function loadBrands() {
     const imgs = files.filter(f => f.type === 'file' && IMGS.test(f.name));
     if (!imgs.length) throw new Error('empty');
 
-    const html = imgs.map(f =>
+    track.innerHTML = imgs.map(f =>
       `<img class="brand-logo" src="${RAW}/brands/${f.name}" alt="${clean(f.name)}" loading="lazy">`
     ).join('');
-    track.innerHTML = html + html; /* duplicate for seamless loop */
   } catch(e) {
-    document.getElementById('brands').style.display = 'none';
+    /* Repo not reachable → show brand names as text so section never disappears */
+    track.innerHTML = FALLBACK_BRANDS.map(b => `<span class="brand-text">${b}</span>`).join('');
   }
 }
 
