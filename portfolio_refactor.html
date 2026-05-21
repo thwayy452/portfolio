@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Thwvy — Graphic Designer</title>
+<meta name="description" content="Thwvy — Graphic Designer & Motion Artist crafting 3D, graphics, and motion.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--bg2:#111;--fg:#f0f0ee;--fg2:#666;
+  --border:rgba(255,255,255,.08);--glass-bg:rgba(255,255,255,.04);
+  --glass-border:rgba(255,255,255,.1);--radius:14px;--max:1160px;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--fg);
+  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;width:100%;height:100%;object-fit:cover}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 2rem}
+
+/* ── Ambient blobs for glass depth ── */
+body::before,body::after{
+  content:'';position:fixed;border-radius:50%;filter:blur(100px);
+  pointer-events:none;z-index:0;opacity:.18;
+}
+body::before{width:600px;height:600px;background:#3a2fff;top:-100px;left:-200px}
+body::after{width:500px;height:500px;background:#ff3a6e;bottom:-100px;right:-150px}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.2rem 0;
+  transition:background .35s var(--ease),border-color .35s var(--ease);
+  border-bottom:1px solid transparent}
+nav.on{background:rgba(8,8,8,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-color:var(--border)}
+.nav-i{display:flex;align-items:center;justify-content:space-between;
+  max-width:var(--max);margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+.logo{font-size:1.15rem;font-weight:700;letter-spacing:-.02em}
+.nav-desk{display:flex;align-items:center;gap:2rem}
+.nav-desk a{font-size:.875rem;color:var(--fg2);transition:color .2s}
+.nav-desk a:hover{color:var(--fg)}
+.pill{padding:.45rem 1.2rem;border:1px solid var(--border);border-radius:100px;
+  color:var(--fg)!important;transition:all .2s}
+.pill:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
+.burger{display:none;flex-direction:column;justify-content:center;gap:5px;
+  background:none;border:none;cursor:pointer;width:32px;height:32px;z-index:300;position:relative}
+.burger span{display:block;width:22px;height:1.5px;background:var(--fg);
+  transition:transform .35s var(--ease),opacity .2s,width .2s}
+.burger.on span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.burger.on span:nth-child(2){opacity:0;width:0}
+.burger.on span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+
+/* ── OVERLAY MENU ── */
+.overlay{position:fixed;inset:0;z-index:250;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:.5rem;
+  background:rgba(8,8,8,.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.overlay.open{opacity:1;pointer-events:all}
+.overlay a{font-size:clamp(2rem,7vw,4rem);font-weight:300;letter-spacing:-.03em;
+  color:var(--fg);transition:color .2s,transform .2s;transform:translateY(10px);
+  opacity:0;transition:opacity .4s var(--ease),transform .4s var(--ease),color .2s}
+.overlay.open a{opacity:1;transform:none}
+.overlay.open a:nth-child(1){transition-delay:.07s}
+.overlay.open a:nth-child(2){transition-delay:.13s}
+.overlay.open a:nth-child(3){transition-delay:.19s}
+.overlay a:hover{color:var(--fg2)}
+.overlay-cta{
+  margin-top:.5rem;font-size:clamp(1rem,2vw,1.2rem)!important;
+  padding:.6rem 1.8rem;border:1px solid rgba(255,255,255,.15)!important;
+  border-radius:100px;font-weight:400!important;letter-spacing:0!important;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  background:rgba(255,255,255,.06)!important;
+}
+.overlay-cta:hover{background:rgba(255,255,255,.12)!important}
+
+/* ── HERO ── */
+#hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;
+  padding:8rem 0 5rem;position:relative;z-index:1}
+.hero-tag{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fg2);margin-bottom:1.5rem}
+.hero-h{font-size:clamp(3.5rem,9vw,8rem);font-weight:300;letter-spacing:-.04em;
+  line-height:1.0;margin-bottom:2rem}
+.hero-h em{font-style:normal;color:var(--fg2)}
+.hero-sub{font-size:clamp(.95rem,1.6vw,1.15rem);color:var(--fg2);max-width:480px;
+  line-height:1.8;margin-bottom:2.5rem}
+.hero-sub a{color:var(--fg);border-bottom:1px solid rgba(255,255,255,.15);transition:border-color .2s}
+.hero-sub a:hover{border-color:rgba(255,255,255,.35)}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.7rem 1.6rem;
+  border-radius:100px;font-size:.875rem;cursor:pointer;border:none;
+  font-family:inherit;transition:all .2s}
+.btn-solid{background:var(--fg);color:#080808}
+.btn-solid:hover{background:#d0d0cc}
+.btn-outline{border:1px solid var(--border);color:var(--fg);background:none}
+.btn-outline:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.05)}
+
+/* ── SECTIONS ── */
+section{padding:7rem 0;position:relative;z-index:1}
+hr.div{border:none;border-top:1px solid var(--border);position:relative;z-index:1}
+.s-tag{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--fg2);margin-bottom:1.2rem}
+.s-h{font-size:clamp(1.9rem,3.5vw,2.8rem);font-weight:300;letter-spacing:-.025em;
+  line-height:1.15;margin-bottom:.7rem}
+.s-sub{font-size:.9rem;color:var(--fg2);margin-bottom:3.5rem}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.f-btn{padding:.32rem .9rem;border-radius:100px;font-size:.75rem;font-family:inherit;
+  border:1px solid var(--border);background:none;color:var(--fg2);cursor:pointer;
+  transition:all .2s;backdrop-filter:blur(6px)}
+.f-btn:hover,.f-btn.on{border-color:rgba(255,255,255,.28);color:var(--fg);
+  background:rgba(255,255,255,.06)}
+
+/* ── GLASS CARDS ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.25rem}
+.card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:var(--radius);
+  overflow:hidden;transition:border-color .3s,transform .3s var(--ease),background .3s;
+}
+.card:hover{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.07);
+  transform:translateY(-5px)}
+.card-img{aspect-ratio:4/3;background:rgba(255,255,255,.03);overflow:hidden;position:relative}
+.card-img img{transition:transform .55s var(--ease)}
+.card:hover .card-img img{transform:scale(1.06)}
+.placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg2)}
+.card-body{padding:1.1rem 1.4rem}
+.card-cat{font-size:.67rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg2);margin-bottom:.3rem}
+.card-title{font-size:.95rem;font-weight:500;margin-bottom:.25rem}
+.card-desc{font-size:.83rem;color:var(--fg2)}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.about-body p{color:var(--fg2);line-height:1.85;margin-bottom:1rem;font-size:.97rem}
+.skills{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:2rem}
+.skill{
+  padding:.28rem .8rem;border-radius:100px;font-size:.75rem;color:var(--fg2);
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.about-photo{
+  aspect-ratio:3/4;border-radius:var(--radius);
+  background:rgba(255,255,255,.03);overflow:hidden;
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+
+/* ── CONTACT ── */
+#contact{text-align:center}
+#contact .s-h{margin-bottom:1.2rem}
+.lead{color:var(--fg2);margin-bottom:2.5rem;font-size:.97rem}
+.contact-link{font-size:clamp(1.4rem,3vw,2.4rem);font-weight:300;letter-spacing:-.02em;
+  border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:4px;
+  transition:border-color .2s,color .2s}
+.contact-link:hover{border-color:rgba(255,255,255,.3);color:var(--fg2)}
+.socials{display:flex;justify-content:center;gap:2rem;margin-top:3rem}
+.socials a{font-size:.83rem;color:var(--fg2);transition:color .2s}
+.socials a:hover{color:var(--fg)}
+
+/* ── FOOTER ── */
+footer{padding:1.75rem 0;border-top:1px solid var(--border);position:relative;z-index:1}
+.foot{display:flex;justify-content:space-between;align-items:center}
+footer p{font-size:.76rem;color:var(--fg2)}
+
+/* ── REVEAL ── */
+.r{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.r.v{opacity:1;transform:none}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .nav-desk{display:none}
+  .burger{display:flex}
+  .about-grid{grid-template-columns:1fr;gap:2rem}
+  .about-photo{display:none}
+  .grid{grid-template-columns:1fr}
+  #hero{padding:7rem 0 4rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-i">
+    <a href="#hero" class="logo">Thwvy.</a>
+    <div class="nav-desk">
+      <a href="#hero">Home</a>
+      <a href="#work">Work</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="pill">Get in touch ↗</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- OVERLAY MENU -->
+<div class="overlay" id="overlay">
+  <a href="#about" id="ol1">About</a>
+  <a href="#contact" id="ol2">Contact</a>
+  <a href="#contact" class="overlay-cta" id="ol3">Get in touch ↗</a>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="wrap">
+    <p class="hero-tag r">Graphic Designer & Motion Artist</p>
+    <h1 class="hero-h r">Hi, I'm<br><em>Thwvy.</em></h1>
+    <p class="hero-sub r">
+      I make <a href="3d.html">3D designs</a>, <a href="graphic.html">graphics</a>,
+      and <a href="animation.html">motion animations</a> —
+      crafting visuals that feel alive and real.
+    </p>
+    <div class="actions r">
+      <a href="#work" class="btn btn-solid">See my work</a>
+      <a href="#contact" class="btn btn-outline">Let's talk</a>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <p class="s-tag r">Selected Work</p>
+    <h2 class="s-h r">Projects I'm proud of.</h2>
+    <p class="s-sub r">Graphic design & campaign work — built with care.</p>
+    <div class="filters r">
+      <button class="f-btn on" data-f="all">All</button>
+      <button class="f-btn" data-f="graphic">Graphic</button>
+      <button class="f-btn" data-f="3d">3D</button>
+      <button class="f-btn" data-f="motion">Motion</button>
+    </div>
+    <div class="grid">
+      <!-- Replace src="./images/..." with your actual image files -->
+      <a href="graphic.html" class="card r" data-cat="graphic">
+        <div class="card-img">
+          <img src="./images/gopro-hero13.jpg" alt="GoPro Hero 13" loading="lazy">
+          <div class="placeholder">GoPro Hero 13</div>
+        </div>
+        <div class="card-body">
+          <p class="card-cat">Graphic Design</p>
+          <h3 class="card-title">GoPro Hero 13</h3>
+          <p class="card-desc">Campaign visual for GoPro's Hero 13 launch.</p>
+        </div>
+      </a>
+      <a href="3d.html" class="card r" data-cat="3d">
+        <div class="card-img">
+          <img src="./images/project-3d.jpg" alt="3D Design" loading="lazy">
+          <div class="placeholder">3D Design</div>
+        </div>
+        <div class="card-body">
+          <p class="card-cat">3D Design</p>
+          <h3 class="card-title">3D Project</h3>
+          <p class="card-desc">Dimensional product visualisation.</p>
+        </div>
+      </a>
+      <a href="animation.html" class="card r" data-cat="motion">
+        <div class="card-img">
+          <img src="./images/project-motion.jpg" alt="Motion" loading="lazy">
+          <div class="placeholder">Motion</div>
+        </div>
+        <div class="card-body">
+          <p class="card-cat">Motion</p>
+          <h3 class="card-title">Motion Animation</h3>
+          <p class="card-desc">Animated brand identity in motion.</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div>
+        <p class="s-tag r">About</p>
+        <h2 class="s-h r">Designer.<br>Motion Artist.</h2>
+        <div class="r">
+          <p>I'm Thwvy — a graphic designer and motion artist focused on creating visuals that feel intentional, alive, and real. My work spans brand identity, 3D, and animation.</p>
+          <p>Every project is an opportunity to push what's possible — balancing aesthetics with meaning to craft something worth remembering.</p>
+        </div>
+        <div class="skills r">
+          <span class="skill">Motion Design</span>
+          <span class="skill">3D Modelling</span>
+          <span class="skill">Brand Identity</span>
+          <span class="skill">Graphic Design</span>
+          <span class="skill">After Effects</span>
+          <span class="skill">Cinema 4D</span>
+          <span class="skill">Illustrator</span>
+          <span class="skill">Photoshop</span>
+        </div>
+      </div>
+      <div class="about-photo r">
+        <img src="./images/thwvy.jpg" alt="Thwvy" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <p class="s-tag r">Contact</p>
+    <h2 class="s-h r">Let's make something.</h2>
+    <p class="lead r">Open to projects, collabs, and good work.</p>
+    <a href="mailto:hello@thwvy.com" class="contact-link r">hello@thwvy.com</a>
+    <div class="socials r">
+      <a href="#" target="_blank" rel="noopener">Instagram</a>
+      <a href="#" target="_blank" rel="noopener">Behance</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot">
+    <p>© 2025 Thwvy</p>
+    <p>Graphic Designer & Motion Artist</p>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('nav'),
+      burger=document.getElementById('burger'),
+      overlay=document.getElementById('overlay');
+
+// Nav on scroll
+window.addEventListener('scroll',()=>nav.classList.toggle('on',scrollY>40),{passive:true});
+
+// Burger toggle
+burger.addEventListener('click',()=>{
+  const open=overlay.classList.toggle('open');
+  burger.classList.toggle('on',open);
+  document.body.style.overflow=open?'hidden':'';
+});
+
+// Close overlay on link click OR tap outside
+const closeMenu=()=>{
+  overlay.classList.remove('open');
+  burger.classList.remove('on');
+  document.body.style.overflow='';
+};
+overlay.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));
+overlay.addEventListener('click',e=>{if(e.target===overlay)closeMenu();});
+
+// Scroll reveal
+const io=new IntersectionObserver(entries=>entries.forEach((e,i)=>{
+  if(e.isIntersecting){
+    setTimeout(()=>e.target.classList.add('v'),i*55);
+    io.unobserve(e.target);
+  }
+}),{threshold:.1,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.r').forEach(el=>io.observe(el));
+
+// Work filter
+document.querySelectorAll('.f-btn').forEach(btn=>btn.addEventListener('click',()=>{
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const f=btn.dataset.f;
+  document.querySelectorAll('.card').forEach(c=>{
+    c.style.display=(f==='all'||c.dataset.cat===f)?'':'none';
+  });
+}));
+</script>
+</body>
+</html>
