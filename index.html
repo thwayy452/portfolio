@@ -1,540 +1,429 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Thwvy — Graphic Designer & Motion Artist</title>
-<meta name="description" content="Thwvy — Graphic Designer & Motion Artist. 3D, graphics, and motion.">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,800;1,300&display=swap" rel="stylesheet">
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#080808;--bg2:#0e0e0e;--fg:#f0f0ee;--muted:#666;
-  --blue:#4d7fff;--border:rgba(255,255,255,.08);
-  --glass:rgba(255,255,255,.04);--gb:rgba(255,255,255,.1);
-  --r:14px;--max:1200px;--nh:68px;
-  --ease:cubic-bezier(.4,0,.2,1);
-}
-html{scroll-behavior:smooth}
-body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--fg);
-  line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-a{color:inherit;text-decoration:none}
-.wrap{max-width:var(--max);margin:0 auto;padding:0 clamp(1.5rem,5vw,3rem)}
+import { useState, useEffect, useRef, useCallback } from "react";
 
-body::before,body::after{content:'';position:fixed;border-radius:50%;
-  filter:blur(130px);pointer-events:none;z-index:0;opacity:.14}
-body::before{width:700px;height:700px;background:#1e3fff;top:-180px;left:-180px}
-body::after{width:600px;height:600px;background:#ff2060;bottom:-120px;right:-150px}
+const HERO_SLIDES = [
+  {
+    id: 1,
+    title: "Hi, I'm Thwvy.",
+    subtitle: "I make 3D designs, Graphics, Motion & Window Display — crafting visuals that feel alive and real.",
+    cta1: "See My Work",
+    cta2: "Let's Talk",
+    bg: "linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%)",
+    accent: "#111",
+  },
+  {
+    id: 2,
+    title: "Projects",
+    subtitle: "I make 3D designs, Graphics, Motion & Window Display — crafting visuals that feel alive and real.",
+    cta1: "View Projects",
+    cta2: "Contact Me",
+    bg: "linear-gradient(135deg, #f0f5ff 0%, #dbe4ff 100%)",
+    accent: "#1a1a2e",
+  },
+  {
+    id: 3,
+    title: "Let's Collaborate",
+    subtitle: "I'll create a website that fulfills your business goals. Ready to bring your ideas to life?",
+    cta1: "Get Started",
+    cta2: "Learn More",
+    bg: "linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)",
+    accent: "#fff",
+  },
+];
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--nh);display:flex;align-items:center;
-  transition:background .35s var(--ease),border-color .35s var(--ease);border-bottom:1px solid transparent}
-nav.on{background:rgba(8,8,8,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-color:var(--border)}
-.nav-i{display:flex;align-items:center;justify-content:space-between;
-  max-width:var(--max);width:100%;margin:0 auto;padding:0 clamp(1.5rem,5vw,3rem)}
-.logo{font-size:1.25rem;font-weight:800;letter-spacing:-.03em}
-.logo .dot{color:var(--blue)}
-.nav-desk{display:flex;align-items:center;gap:2.25rem}
-.nav-desk a{font-size:.875rem;color:var(--muted);transition:color .2s}
-.nav-desk a:hover{color:var(--fg)}
-.pill{padding:.4rem 1.25rem;border:1px solid var(--border);border-radius:100px;color:var(--fg)!important;transition:all .2s}
-.pill:hover{border-color:rgba(255,255,255,.25);background:rgba(255,255,255,.06)}
-.burger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;
-  cursor:pointer;width:36px;height:36px;z-index:300;position:relative}
-.burger span{display:block;width:22px;height:1.5px;background:var(--fg);transition:transform .35s var(--ease),opacity .2s,width .2s}
-.burger.on span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
-.burger.on span:nth-child(2){opacity:0;width:0}
-.burger.on span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+const BRANDS = ["Bata", "CNi", "EmailBoost", "TURSIAN", "BrowseStoriesToo", "QMark"];
 
-/* OVERLAY MENU */
-.overlay{position:fixed;inset:0;z-index:250;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:.75rem;background:rgba(8,8,8,.82);backdrop-filter:blur(26px);
-  -webkit-backdrop-filter:blur(26px);opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
-.overlay.open{opacity:1;pointer-events:all}
-.overlay a{font-size:clamp(2.4rem,7vw,4.5rem);font-weight:300;letter-spacing:-.03em;color:var(--fg);
-  opacity:0;transform:translateY(12px);transition:opacity .4s var(--ease),transform .4s var(--ease),color .2s}
-.overlay.open a{opacity:1;transform:none}
-.overlay.open a:nth-child(1){transition-delay:.07s}
-.overlay.open a:nth-child(2){transition-delay:.14s}
-.overlay.open a:nth-child(3){transition-delay:.21s}
-.overlay a:hover{color:var(--muted)}
-.ov-pill{font-size:clamp(.95rem,2vw,1.1rem)!important;font-weight:500!important;letter-spacing:.01em!important;
-  padding:.65rem 2rem;border:1px solid rgba(255,255,255,.18)!important;border-radius:100px;
-  background:rgba(255,255,255,.07)!important;margin-top:.75rem;
-  transition:opacity .4s var(--ease),transform .4s var(--ease),background .2s!important}
-.ov-pill:hover{background:rgba(255,255,255,.13)!important;color:var(--fg)!important}
+const PROJECTS = [
+  { title: "Tennis\nRackets", color: "#1a3a2a", emoji: "🎾" },
+  { title: "Gym\nDumbbells", color: "#1a2a3a", emoji: "🏋️" },
+  { title: "Badminton\nBalls", color: "#2a3a1a", emoji: "🏸" },
+  { title: "Boxing\nGloves", color: "#1a1a2a", emoji: "🥊" },
+];
 
-/* HERO */
-#hero{min-height:100svh;display:grid;grid-template-columns:1fr 1fr;align-items:end;gap:4rem;
-  padding:calc(var(--nh)+5rem) 0 5rem;position:relative;z-index:1}
-.hero-tag{font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1.5rem}
-.hero-h{font-size:clamp(3.5rem,7vw,7rem);font-weight:800;letter-spacing:-.045em;line-height:.95;margin-bottom:2rem}
-.hero-h .greet{font-weight:300;font-style:italic;color:var(--muted)}
-.hero-h .dot{color:var(--blue)}
-.hero-sub{font-size:clamp(.95rem,1.4vw,1.1rem);color:var(--muted);line-height:1.85;margin-bottom:2.5rem}
-.hero-sub a{color:var(--fg);border-bottom:1px solid rgba(255,255,255,.15);font-weight:500;transition:border-color .2s,color .2s}
-.hero-sub a:hover{border-color:var(--blue);color:var(--blue)}
-.actions{display:flex;gap:.75rem;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;padding:.7rem 1.6rem;border-radius:100px;font-size:.875rem;
-  cursor:pointer;border:none;font-family:inherit;font-weight:500;transition:all .2s}
-.btn-solid{background:var(--fg);color:#080808}
-.btn-solid:hover{background:#d0d0cc}
-.btn-outline{border:1px solid var(--border);color:var(--fg);background:none}
-.btn-outline:hover{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.05)}
-.hero-right{display:flex;align-items:flex-end;justify-content:flex-end}
-.hero-stat{text-align:right}
-.hero-stat .num{font-size:clamp(3rem,6vw,5rem);font-weight:800;letter-spacing:-.04em;color:var(--fg);line-height:1}
-.hero-stat .label{font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:.25rem}
+const STATS = [
+  { number: "50+", label: "Projects Completed" },
+  { number: "20+", label: "Happy Clients" },
+  { number: "3+", label: "Years Experience" },
+  { number: "∞", label: "Ideas to Build" },
+];
 
-/* SECTION */
-section{padding:6rem 0;position:relative;z-index:1}
-hr.div{border:none;border-top:1px solid var(--border);position:relative;z-index:1}
-.s-tag{font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem}
-.s-h{font-size:clamp(2rem,3.5vw,2.8rem);font-weight:300;letter-spacing:-.025em;line-height:1.15;margin-bottom:.75rem}
-.s-sub{font-size:.9rem;color:var(--muted);margin-bottom:3.5rem;max-width:540px}
+const WORK_ITEMS = [
+  { title: "Pathways", desc: "Dive into a world of knowledge tailored to your goals. Content-branded courses.", tags: ["Coding", "Design", "Health"], color: "#1a3a2a" },
+  { title: "Teamwork", desc: "We offer cutting-edge tools and techniques available.", color: "#f5f5f0", dark: true },
+  { title: "Discover learning path", desc: "Stay organized and on track with your personalized learning.", color: "#e8edf5" },
+];
 
-/* WORK SUB-SECTIONS */
-.work-sub{scroll-margin-top:calc(var(--nh)+1.5rem);margin-bottom:5rem}
-.work-sub:last-child{margin-bottom:0}
-.sub-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:1rem;
-  border-bottom:1px solid var(--border);margin-bottom:2rem}
-.sub-title{font-size:1.15rem;font-weight:600;letter-spacing:-.015em}
-.sub-count{font-size:.75rem;color:var(--muted);background:var(--glass);border:1px solid var(--border);
-  padding:.25rem .7rem;border-radius:100px}
+export default function Portfolio() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const [activeNav, setActiveNav] = useState("Home");
+  const [projectsDropdown, setProjectsDropdown] = useState(false);
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [visibleSections, setVisibleSections] = useState({});
+  const timerRef = useRef(null);
 
-/* GLASS CARDS */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem}
-.card{background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--gb);border-radius:var(--r);overflow:hidden;display:block;cursor:pointer;
-  transition:border-color .3s,transform .3s var(--ease),background .3s}
-.card:hover{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);transform:translateY(-5px)}
-.card-img{aspect-ratio:16/9;background:rgba(255,255,255,.03);overflow:hidden}
-.card-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s var(--ease)}
-.card:hover .card-img img{transform:scale(1.06)}
-.card-body{padding:1rem 1.25rem}
-.card-cat{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem}
-.card-title{font-size:.9rem;font-weight:500;text-transform:capitalize;line-height:1.4}
-.empty{color:var(--muted);font-size:.85rem;padding:2.5rem 0}
-.empty code{background:rgba(255,255,255,.07);padding:.15rem .5rem;border-radius:5px;font-size:.8rem}
+  const goToSlide = useCallback((index) => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentSlide(index);
+    setTimeout(() => setIsTransitioning(false), 600);
+  }, [isTransitioning]);
 
-/* BRANDS */
-#brands{padding:5rem 0}
-.brand-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
-  gap:2.5rem 4rem;margin:3rem auto 0;max-width:880px}
-.brand-logo{height:40px;width:auto;max-width:150px;object-fit:contain;
-  filter:brightness(0) invert(1);opacity:.55;transition:opacity .3s,transform .3s}
-.brand-logo:hover{opacity:1;transform:scale(1.06)}
-.brand-text{font-size:1.4rem;font-weight:600;color:#fff;opacity:.5;letter-spacing:-.01em;transition:opacity .3s}
-.brand-text:hover{opacity:.9}
+  const nextSlide = useCallback(() => {
+    goToSlide((currentSlide + 1) % HERO_SLIDES.length);
+  }, [currentSlide, goToSlide]);
 
-/* ABOUT */
-.about-grid{display:grid;grid-template-columns:1fr 420px;gap:6rem;align-items:start}
-.about-body p{color:var(--muted);line-height:1.9;margin-bottom:1rem;font-size:.97rem}
-.skills{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:2rem}
-.skill{padding:.28rem .85rem;border-radius:100px;font-size:.75rem;color:var(--muted);
-  background:var(--glass);border:1px solid var(--gb);backdrop-filter:blur(8px)}
-.about-photo{aspect-ratio:1/1;border-radius:var(--r);background:rgba(255,255,255,.03);overflow:hidden;
-  border:1px solid var(--gb);display:flex;align-items:center;justify-content:center}
-.about-photo img{width:78%;height:78%;object-fit:contain;filter:invert(1);opacity:.88}
+  useEffect(() => {
+    timerRef.current = setInterval(nextSlide, 5000);
+    return () => clearInterval(timerRef.current);
+  }, [nextSlide]);
 
-/* CONTACT */
-#contact{text-align:center}
-#contact .s-h{margin-bottom:1.25rem}
-.lead{color:var(--muted);margin-bottom:2.5rem;font-size:.97rem}
-.contact-link{font-size:clamp(1.6rem,3.5vw,2.6rem);font-weight:300;letter-spacing:-.02em;
-  border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:4px;transition:border-color .2s,color .2s}
-.contact-link:hover{border-color:var(--blue);color:var(--muted)}
-.socials{display:flex;justify-content:center;gap:2.5rem;margin-top:3rem}
-.socials a{font-size:.83rem;color:var(--muted);transition:color .2s}
-.socials a:hover{color:var(--fg)}
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVisibleSections((prev) => ({ ...prev, [entry.target.id]: true }));
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+    document.querySelectorAll("[data-animate]").forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
-/* FOOTER */
-footer{padding:1.75rem 0;border-top:1px solid var(--border);position:relative;z-index:1}
-.foot{display:flex;justify-content:space-between;align-items:center}
-footer p{font-size:.76rem;color:var(--muted)}
+  const slide = HERO_SLIDES[currentSlide];
+  const isLight = currentSlide !== 2;
 
-/* MODAL */
-.modal{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;
-  padding:2rem;background:rgba(5,5,5,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
-.modal.open{opacity:1;pointer-events:all}
-.modal-card{position:relative;width:100%;max-width:1080px;max-height:90vh;overflow-y:auto;
-  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
-  transform:scale(.96);transition:transform .3s var(--ease)}
-.modal.open .modal-card{transform:scale(1)}
-.modal-close{position:absolute;top:1.25rem;right:1.25rem;z-index:3;width:40px;height:40px;border-radius:10px;
-  border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--fg);font-size:1.4rem;
-  line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-.modal-close:hover{background:rgba(255,255,255,.14)}
-.modal-grid{display:grid;grid-template-columns:1fr 1fr}
-.modal-img{padding:2rem;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.02)}
-.modal-img img{width:100%;height:auto;max-height:74vh;object-fit:contain;border-radius:12px}
-.modal-img model-viewer{width:100%;height:460px;background:transparent}
-.modal-info{padding:2.5rem}
-.m-cat{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:600;margin-bottom:1rem}
-.m-title{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:1.25rem;text-transform:capitalize}
-.m-desc{color:var(--muted);line-height:1.7;margin-bottom:2rem;font-size:.95rem}
-.m-section{margin-bottom:2rem}
-.m-section:last-child{margin-bottom:0}
-.m-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--fg);margin-bottom:1rem}
-.m-tools{display:flex;flex-wrap:wrap;gap:.5rem}
-.m-tool{padding:.4rem 1rem;border-radius:8px;font-size:.8rem;font-weight:500;
-  background:rgba(77,127,255,.12);color:#9ab6ff;border:1px solid rgba(77,127,255,.22)}
-.step{padding-left:1.25rem;border-left:2px solid rgba(77,127,255,.3);margin-bottom:1.5rem}
-.step:last-child{margin-bottom:0}
-.step-num{font-size:1.4rem;font-weight:800;color:rgba(77,127,255,.55);line-height:1;margin-bottom:.4rem}
-.step-title{font-size:.95rem;font-weight:600;margin-bottom:.35rem}
-.step-desc{font-size:.85rem;color:var(--muted);line-height:1.6}
+  return (
+    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#0a0a0a", color: "#fff", minHeight: "100vh", overflowX: "hidden" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-/* REVEAL */
-.r{opacity:0;transform:translateY(18px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
-.r.v{opacity:1;transform:none}
-
-/* RESPONSIVE */
-@media(max-width:900px){
-  #hero{grid-template-columns:1fr;gap:2rem}
-  .hero-right{display:none}
-  .about-grid{grid-template-columns:1fr;gap:2.5rem}
-  .about-photo{max-width:280px}
-  .grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
-  .modal-grid{grid-template-columns:1fr}
-}
-@media(max-width:768px){
-  .nav-desk{display:none}
-  .burger{display:flex}
-  .grid{grid-template-columns:1fr}
-  #hero{padding-top:calc(var(--nh)+3rem);padding-bottom:3.5rem}
-  .modal{padding:1rem}
-  .modal-info{padding:1.75rem}
-  .modal-img{padding:1.25rem}
-}
-</style>
-</head>
-<body>
-
-<!-- NAV -->
-<nav id="nav">
-  <div class="nav-i">
-    <a href="#hero" class="logo">Thwvy<span class="dot">.</span></a>
-    <div class="nav-desk">
-      <a href="#hero">Home</a>
-      <a href="#work">Work</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-      <a href="#contact" class="pill">Get in touch ↗</a>
-    </div>
-    <button class="burger" id="burger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
-  </div>
-</nav>
-
-<!-- OVERLAY -->
-<div class="overlay" id="overlay">
-  <a href="#about">About</a>
-  <a href="#contact">Contact</a>
-  <a href="#contact" class="ov-pill">Get in touch ↗</a>
-</div>
-
-<!-- HERO -->
-<section id="hero">
-  <div class="r">
-    <p class="hero-tag">Graphic Designer & Motion Artist — Bangkok</p>
-    <h1 class="hero-h"><span class="greet">Hi, I'm</span><br>Thwvy<span class="dot">.</span></h1>
-    <p class="hero-sub">
-      I make <a href="#work-3d">3D designs</a>, <a href="#work-graphic">graphics</a>,
-      and <a href="#work-motion">motion animations</a> — crafting visuals that feel alive and real.
-    </p>
-    <div class="actions">
-      <a href="#work" class="btn btn-solid">See my work</a>
-      <a href="#contact" class="btn btn-outline">Let's talk</a>
-    </div>
-  </div>
-  <div class="hero-right r" style="transition-delay:.15s">
-    <div class="hero-stat">
-      <div class="num" id="projCount">–<span style="color:var(--blue)">+</span></div>
-      <div class="label">Projects completed</div>
-    </div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- WORK -->
-<section id="work">
-  <div class="wrap">
-    <p class="s-tag r">Selected Work</p>
-    <h2 class="s-h r">Projects I'm proud of.</h2>
-    <p class="s-sub r">3D, graphic design & motion — built with care.</p>
-
-    <div class="work-sub r" id="work-3d">
-      <div class="sub-head"><h3 class="sub-title">3D Design</h3><span class="sub-count" id="c3d">…</span></div>
-      <div class="grid" id="g3d"><p class="empty">Loading…</p></div>
-    </div>
-
-    <div class="work-sub r" id="work-graphic">
-      <div class="sub-head"><h3 class="sub-title">Graphic Design</h3><span class="sub-count" id="cgr">…</span></div>
-      <div class="grid" id="ggr"><p class="empty">Loading…</p></div>
-    </div>
-
-    <div class="work-sub r" id="work-motion">
-      <div class="sub-head"><h3 class="sub-title">Motion</h3><span class="sub-count" id="cmo">…</span></div>
-      <div class="grid" id="gmo"><p class="empty">Loading…</p></div>
-    </div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- BRANDS -->
-<section id="brands">
-  <div class="wrap">
-    <p class="s-tag r">Clients</p>
-    <h2 class="s-h r">Brands I worked with.</h2>
-    <div class="brand-grid r" id="brandGrid"><span style="color:var(--muted);font-size:.85rem">Loading…</span></div>
-  </div>
-</section>
-
-<hr class="div">
-
-<!-- ABOUT -->
-<section id="about">
-  <div class="wrap">
-    <div class="about-grid">
-      <div>
-        <p class="s-tag r">About</p>
-        <h2 class="s-h r">Designer.<br>Motion Artist.</h2>
-        <div class="r">
-          <p>I'm Thwvy — a graphic designer and motion artist based in Bangkok, focused on creating visuals that feel intentional, alive, and real. My work spans brand identity, 3D, and animation.</p>
-          <p>Every project is an opportunity to push what's possible — balancing aesthetics with meaning to craft something worth remembering.</p>
+      {/* NAV */}
+      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: "rgba(10,10,10,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: -0.5 }}>Thwvy.</span>
+          <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
+            {["Home", "My Projects", "About", "Contact"].map((item) => (
+              <div key={item} style={{ position: "relative" }}>
+                {item === "My Projects" ? (
+                  <button
+                    onClick={() => setProjectsDropdown(!projectsDropdown)}
+                    style={{ background: "none", border: "none", color: activeNav === item ? "#fff" : "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 14, fontWeight: 500, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}
+                  >
+                    {item} <span style={{ fontSize: 10, transform: projectsDropdown ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
+                  </button>
+                ) : (
+                  <a
+                    href={`#${item.toLowerCase()}`}
+                    onClick={() => setActiveNav(item)}
+                    style={{ color: activeNav === item ? "#fff" : "rgba(255,255,255,0.5)", textDecoration: "none", fontSize: 14, fontWeight: 500, transition: "color 0.2s" }}
+                  >
+                    {item}
+                  </a>
+                )}
+                {item === "My Projects" && projectsDropdown && (
+                  <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 8, background: "#1a1a1a", borderRadius: 12, padding: "8px 0", minWidth: 150, boxShadow: "0 16px 48px rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}>
+                    {["3D", "Graphic", "Motion"].map((sub) => (
+                      <a key={sub} href="#work" style={{ display: "block", padding: "10px 20px", color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 13, transition: "all 0.2s" }}
+                        onMouseEnter={(e) => { e.target.style.background = "rgba(255,255,255,0.05)"; e.target.style.color = "#fff"; }}
+                        onMouseLeave={(e) => { e.target.style.background = "transparent"; e.target.style.color = "rgba(255,255,255,0.7)"; }}
+                      >{sub}</a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            <a href="#contact" style={{ background: "#22c55e", color: "#000", padding: "8px 20px", borderRadius: 20, fontSize: 13, fontWeight: 600, textDecoration: "none", transition: "transform 0.2s, box-shadow 0.2s" }}
+              onMouseEnter={(e) => { e.target.style.transform = "translateY(-1px)"; e.target.style.boxShadow = "0 4px 16px rgba(34,197,94,0.3)"; }}
+              onMouseLeave={(e) => { e.target.style.transform = "none"; e.target.style.boxShadow = "none"; }}
+            >Get in touch →</a>
+          </div>
         </div>
-        <div class="skills r">
-          <span class="skill">Motion Design</span><span class="skill">3D Modelling</span>
-          <span class="skill">Brand Identity</span><span class="skill">Graphic Design</span>
-          <span class="skill">After Effects</span><span class="skill">Cinema 4D</span>
-          <span class="skill">Illustrator</span><span class="skill">Photoshop</span>
+      </nav>
+
+      {/* HERO BANNER CAROUSEL */}
+      <section id="home" style={{ paddingTop: 64, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "relative", height: "min(85vh, 640px)", overflow: "hidden" }}>
+          {HERO_SLIDES.map((s, i) => (
+            <div
+              key={s.id}
+              style={{
+                position: "absolute", inset: 0,
+                background: s.bg,
+                opacity: currentSlide === i ? 1 : 0,
+                transform: currentSlide === i ? "scale(1)" : "scale(1.05)",
+                transition: "opacity 0.6s ease, transform 0.8s ease",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}
+            >
+              <div style={{ maxWidth: 700, textAlign: "center", padding: "0 24px", transform: currentSlide === i ? "translateY(0)" : "translateY(30px)", opacity: currentSlide === i ? 1 : 0, transition: "all 0.6s ease 0.2s" }}>
+                {i === 2 && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginBottom: 12 }}>
+                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
+                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>Mark Vassilevsky</span>
+                  </div>
+                )}
+                <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 700, color: s.accent, lineHeight: 1.1, margin: "0 0 20px" }}>
+                  {s.title}
+                </h1>
+                <p style={{ fontSize: "clamp(14px, 2vw, 17px)", color: isLight && i !== 2 ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: "0 0 32px", maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
+                  {s.subtitle}
+                </p>
+                <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                  <a href="#work" style={{ padding: "12px 28px", borderRadius: 8, background: i === 2 ? "#fff" : "#111", color: i === 2 ? "#f7931e" : "#fff", fontSize: 14, fontWeight: 600, textDecoration: "none", border: "none", transition: "transform 0.2s" }}
+                    onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
+                    onMouseLeave={(e) => e.target.style.transform = "none"}
+                  >{s.cta1}</a>
+                  <a href="#contact" style={{ padding: "12px 28px", borderRadius: 8, background: "transparent", color: i === 2 ? "#fff" : "#111", fontSize: 14, fontWeight: 600, textDecoration: "none", border: `1.5px solid ${i === 2 ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)"}`, transition: "transform 0.2s" }}
+                    onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
+                    onMouseLeave={(e) => e.target.style.transform = "none"}
+                  >{s.cta2}</a>
+                </div>
+              </div>
+              {/* Decorative elements per slide */}
+              {i === 0 && (
+                <>
+                  <div style={{ position: "absolute", top: "15%", right: "10%", width: 120, height: 120, background: "linear-gradient(135deg, #4ecdc4, #44bd89)", borderRadius: 20, transform: "rotate(15deg)", opacity: 0.7, animation: "float 4s ease-in-out infinite" }} />
+                  <div style={{ position: "absolute", bottom: "20%", right: "15%", width: 60, height: 60, background: "#2563eb", borderRadius: "50%", opacity: 0.5, animation: "float 3s ease-in-out infinite 1s" }} />
+                  <div style={{ position: "absolute", top: "30%", right: "20%", fontSize: 40 }}>✓</div>
+                </>
+              )}
+              {i === 1 && (
+                <>
+                  <div style={{ position: "absolute", top: "20%", left: "8%", width: 100, height: 130, background: "linear-gradient(to bottom, #a8e6cf, #88d8b0)", borderRadius: 12, opacity: 0.6, animation: "float 5s ease-in-out infinite" }} />
+                  <div style={{ position: "absolute", bottom: "25%", left: "12%", width: 80, height: 80, background: "#ff6b6b", borderRadius: 16, transform: "rotate(-10deg)", opacity: 0.5, animation: "float 4s ease-in-out infinite 0.5s" }} />
+                </>
+              )}
+            </div>
+          ))}
+
+          {/* Dots */}
+          <div style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 10, zIndex: 10 }}>
+            {HERO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goToSlide(i)}
+                style={{
+                  width: currentSlide === i ? 28 : 10, height: 10,
+                  borderRadius: 5,
+                  background: currentSlide === i ? (isLight ? "#111" : "#fff") : "rgba(128,128,128,0.4)",
+                  border: "none", cursor: "pointer",
+                  transition: "all 0.3s ease",
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Arrows */}
+          <button onClick={() => goToSlide((currentSlide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
+            style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "background 0.2s" }}
+            onMouseEnter={(e) => e.target.style.background = "rgba(0,0,0,0.6)"}
+            onMouseLeave={(e) => e.target.style.background = "rgba(0,0,0,0.3)"}
+          >←</button>
+          <button onClick={() => goToSlide((currentSlide + 1) % HERO_SLIDES.length)}
+            style={{ position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "background 0.2s" }}
+            onMouseEnter={(e) => e.target.style.background = "rgba(0,0,0,0.6)"}
+            onMouseLeave={(e) => e.target.style.background = "rgba(0,0,0,0.3)"}
+          >→</button>
         </div>
-      </div>
-      <div class="about-photo r" style="transition-delay:.15s">
-        <img src="favicon.png" alt="Thwvy avatar">
-      </div>
-    </div>
-  </div>
-</section>
+      </section>
 
-<hr class="div">
+      {/* ABOUT */}
+      <section id="about" data-animate style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px 40px", textAlign: "center", opacity: visibleSections["about"] ? 1 : 0, transform: visibleSections["about"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
+        <p style={{ fontSize: "clamp(16px, 2.5vw, 20px)", color: "rgba(255,255,255,0.7)", lineHeight: 1.7 }}>
+          Every project is built with <strong style={{ color: "#fff" }}>clean thinking</strong> and a <strong style={{ color: "#fff" }}>focus</strong> on what actually looks great. Open to freelance projects and creative collaborations.
+        </p>
+      </section>
 
-<!-- CONTACT -->
-<section id="contact">
-  <div class="wrap">
-    <p class="s-tag r">Contact</p>
-    <h2 class="s-h r">Let's make something.</h2>
-    <p class="lead r">Open to projects, collabs, and good work.</p>
-    <a href="mailto:hello@thwvy.com" class="contact-link r">hello@thwvy.com</a>
-    <div class="socials r">
-      <a href="#" target="_blank" rel="noopener">Instagram</a>
-      <a href="#" target="_blank" rel="noopener">Behance</a>
-      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
-  </div>
-</section>
-
-<footer>
-  <div class="wrap foot"><p>© 2025 Thwvy</p><p>Graphic Designer & Motion Artist</p></div>
-</footer>
-
-<!-- PROJECT MODAL -->
-<div class="modal" id="modal">
-  <div class="modal-card">
-    <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-    <div class="modal-grid">
-      <div class="modal-img" id="mImgWrap"></div>
-      <div class="modal-info">
-        <p class="m-cat" id="mCat"></p>
-        <h2 class="m-title" id="mTitle"></h2>
-        <p class="m-desc" id="mDesc"></p>
-        <div class="m-section">
-          <p class="m-label">Tools & Software</p>
-          <div class="m-tools" id="mTools"></div>
+      {/* SELECTED WORK */}
+      <section id="work" data-animate style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 80px", opacity: visibleSections["work"] ? 1 : 0, transform: visibleSections["work"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 16 }}>
+          {WORK_ITEMS.map((item, i) => (
+            <div key={i} style={{
+              background: item.color,
+              borderRadius: 20,
+              padding: 28,
+              minHeight: 220,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              border: item.dark ? "1px solid rgba(0,0,0,0.08)" : "1px solid rgba(255,255,255,0.08)",
+              transition: "transform 0.3s ease, box-shadow 0.3s ease",
+              cursor: "pointer",
+            }}
+              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.3)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
+            >
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 600, color: item.dark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1.5 }}>✦ Polymorph</span>
+                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 22, fontWeight: 700, color: item.dark ? "#111" : "#fff", margin: "12px 0 8px" }}>{item.title}</h3>
+                <p style={{ fontSize: 13, color: item.dark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{item.desc}</p>
+              </div>
+              {item.tags && (
+                <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
+                  {item.tags.map((t) => (
+                    <span key={t} style={{ padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 500 }}>{t}</span>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <div class="m-section">
-          <p class="m-label">Design Process</p>
-          <div id="mProcess"></div>
+
+        {/* New-packed education card */}
+        <div style={{
+          background: "linear-gradient(135deg, #1a3a2a 0%, #0f2518 100%)",
+          borderRadius: 20, padding: 36, marginTop: 16,
+          position: "relative", overflow: "hidden",
+          minHeight: 200,
+        }}>
+          <div style={{ position: "absolute", inset: 0, background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 300\"><path d=\"M0,150 Q150,50 300,150 T600,150\" fill=\"none\" stroke=\"rgba(255,255,255,0.05)\" stroke-width=\"2\"/><path d=\"M0,170 Q150,70 300,170 T600,170\" fill=\"none\" stroke=\"rgba(255,255,255,0.03)\" stroke-width=\"2\"/></svg>') center/cover" }} />
+          <div style={{ position: "relative", zIndex: 1 }}>
+            <span style={{ background: "#22c55e", color: "#000", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>New</span>
+            <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: "#fff", margin: "16px 0 20px", lineHeight: 1.2 }}>New-packed<br />education</h3>
+            <div style={{ display: "flex", gap: 8 }}>
+              <span style={{ padding: "8px 20px", borderRadius: 20, background: "#22c55e", color: "#000", fontSize: 13, fontWeight: 600 }}>All topics</span>
+              <span style={{ padding: "8px 20px", borderRadius: 20, background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, fontWeight: 500 }}>Library</span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* BRANDS */}
+      <section data-animate id="brands" style={{ padding: "40px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)", opacity: visibleSections["brands"] ? 1 : 0, transform: visibleSections["brands"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
+        <p style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 28, letterSpacing: 0.5 }}>Brands I worked with</p>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(24px, 5vw, 56px)", flexWrap: "wrap", maxWidth: 800, margin: "0 auto" }}>
+          {BRANDS.map((b) => (
+            <span key={b} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(14px, 2vw, 18px)", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1, transition: "color 0.3s" }}
+              onMouseEnter={(e) => e.target.style.color = "rgba(255,255,255,0.6)"}
+              onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.25)"}
+            >{b}</span>
+          ))}
+        </div>
+      </section>
+
+      {/* PROJECTS GRID */}
+      <section data-animate id="projects" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", opacity: visibleSections["projects"] ? 1 : 0, transform: visibleSections["projects"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+          {PROJECTS.map((p, i) => (
+            <div key={i} style={{
+              background: `linear-gradient(145deg, ${p.color}, ${p.color}dd)`,
+              borderRadius: 20, padding: 28, minHeight: 200,
+              display: "flex", flexDirection: "column", justifyContent: "space-between",
+              position: "relative", overflow: "hidden",
+              cursor: "pointer", transition: "transform 0.3s ease",
+              border: "1px solid rgba(255,255,255,0.06)",
+            }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-4px)"}
+              onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
+            >
+              <div>
+                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, color: "#fff", lineHeight: 1.2, whiteSpace: "pre-line" }}>{p.title}</h3>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                <a href="#" style={{ color: "#22c55e", fontSize: 13, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+                  ↗ LEARN MORE
+                </a>
+                <span style={{ fontSize: 56, opacity: 0.6, lineHeight: 1 }}>{p.emoji}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section data-animate id="stats" style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 80px", opacity: visibleSections["stats"] ? 1 : 0, transform: visibleSections["stats"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, textAlign: "center" }}>
+          {STATS.map((s, i) => (
+            <div key={i}>
+              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 700, color: "#22c55e" }}>{s.number}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section id="contact" data-animate style={{
+        background: "linear-gradient(180deg, #0a0a0a 0%, #111 100%)",
+        padding: "80px 24px",
+        opacity: visibleSections["contact"] ? 1 : 0,
+        transform: visibleSections["contact"] ? "translateY(0)" : "translateY(40px)",
+        transition: "all 0.8s ease",
+      }}>
+        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#22c55e", textTransform: "uppercase", letterSpacing: 2 }}>Contact</span>
+          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 700, margin: "12px 0 12px", color: "#fff" }}>Have a project in<br />mind?</h2>
+          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 40 }}>I'm open to new work. Send me a message and I'll reply within a day.</p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
+            <input
+              type="text" placeholder="Your name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              style={{ padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", transition: "border 0.2s" }}
+              onFocus={(e) => e.target.style.borderColor = "#22c55e"}
+              onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+            />
+            <input
+              type="email" placeholder="you@email.com"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              style={{ padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", transition: "border 0.2s" }}
+              onFocus={(e) => e.target.style.borderColor = "#22c55e"}
+              onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+            />
+          </div>
+          <textarea
+            placeholder="Tell me about your project..."
+            rows={4}
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            style={{ width: "100%", padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", resize: "vertical", marginBottom: 16, boxSizing: "border-box", transition: "border 0.2s" }}
+            onFocus={(e) => e.target.style.borderColor = "#22c55e"}
+            onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
+          />
+          <button style={{
+            width: "100%", padding: "16px", borderRadius: 10, border: "none",
+            background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff",
+            fontSize: 15, fontWeight: 600, fontFamily: "inherit", cursor: "pointer",
+            transition: "transform 0.2s, box-shadow 0.2s",
+          }}
+            onMouseEnter={(e) => { e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 8px 32px rgba(34,197,94,0.3)"; }}
+            onMouseLeave={(e) => { e.target.style.transform = "none"; e.target.style.boxShadow = "none"; }}
+          >Send message</button>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "32px 24px" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>© 2026 Thwvy. All rights reserved.</span>
+          <div style={{ display: "flex", gap: 24 }}>
+            {["Instagram", "TikTok", "LinkedIn", "Discord", "Github"].map((s) => (
+              <a key={s} href="#" style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textDecoration: "none", transition: "color 0.2s" }}
+                onMouseEnter={(e) => e.target.style.color = "#fff"}
+                onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.3)"}
+              >{s}</a>
+            ))}
+          </div>
+        </div>
+      </footer>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(15deg); }
+          50% { transform: translateY(-15px) rotate(15deg); }
+        }
+        * { box-sizing: border-box; margin: 0; }
+        html { scroll-behavior: smooth; }
+        ::placeholder { color: rgba(255,255,255,0.25); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+      `}</style>
     </div>
-  </div>
-</div>
-
-<script>
-/* ─── CONFIG — change folder names here to match your repo ─── */
-const REPO = 'thwayy452/portfolio', BRANCH = 'main';
-const RAW = `https://raw.githubusercontent.com/${REPO}/${BRANCH}`;
-const API = `https://api.github.com/repos/${REPO}/contents`;
-const FOLDERS = {
-  graphic: 'images',   // ← graphics ONLY live here
-  '3d':    '3d',       // ← 3D files (GLB + images) live here
-  motion:  'motion',   // ← motion files live here
-  brands:  'brands'    // ← brand logos live here
-};
-const IMGS = /\.(png|jpg|jpeg|webp|gif|svg)$/i;
-const GLBS = /\.glb$/i;
-
-/* ─── Per-project metadata (optional). Key = cleaned filename. ─── */
-const META = {
-  'samsung galaxy campaign': {
-    cat: 'Campaign',
-    desc: 'A sleek and modern campaign design for Samsung Galaxy S25 Edge featuring premium product photography and bold typography highlighting the latest innovation.',
-    tools: ['Adobe Photoshop','Figma','Illustrator'],
-    process: [
-      ['Product Research','Analyzed Samsung Galaxy specifications and target audience. Created mood boards with premium aesthetic and modern design language.'],
-      ['Layout Design','Designed campaign layout with focus on product prominence. Used clean typography and white space for a sophisticated look.'],
-      ['Final Production','Optimized for digital and print. Applied color grading and ensured all elements align with Samsung branding guidelines.']
-    ]
-  }
-};
-
-/* Sensible defaults per category */
-const TOOLS = {
-  'Graphic Design': ['Adobe Photoshop','Illustrator','Figma'],
-  '3D Design': ['Cinema 4D','Blender','Octane Render'],
-  'Motion': ['After Effects','Cinema 4D','Premiere Pro']
-};
-const PROCESS = {
-  'Graphic Design': [
-    ['Research','Analyzed the brief, audience and references. Built mood boards and defined the visual direction.'],
-    ['Layout Design','Developed the composition with focus on hierarchy, typography and balanced white space.'],
-    ['Final Production','Optimized for digital and print, applied color grading and aligned to brand guidelines.']],
-  '3D Design': [
-    ['Concept','Defined the scene, mood and reference direction for the 3D piece.'],
-    ['Modelling','Built and textured the geometry, set up materials and lighting.'],
-    ['Render & Polish','Rendered final frames and applied post-processing and color grading.']],
-  'Motion': [
-    ['Storyboard','Planned the sequence, timing and key beats of the animation.'],
-    ['Animation','Animated elements with attention to easing, rhythm and motion feel.'],
-    ['Final Render','Exported, refined timing and delivered the polished final output.']]
-};
-
-const clean = n => n.replace(/^(3d|graphic|motion|brand)[-_ ]/i,'')
-                    .replace(/\.[^.]+$/,'').replace(/[-_]/g,' ').trim();
-const getMeta = (title, cat) => {
-  const m = META[title.toLowerCase()] || {};
-  return {
-    cat: m.cat || cat,
-    desc: m.desc || `A ${cat.toLowerCase()} project crafted with care and attention to detail.`,
-    tools: m.tools || TOOLS[cat] || ['Photoshop','Illustrator'],
-    process: m.process || PROCESS[cat] || PROCESS['Graphic Design']
-  };
-};
-
-/* ─── Nav / burger / overlay ─── */
-const nav = document.getElementById('nav');
-addEventListener('scroll', () => nav.classList.toggle('on', scrollY > 40), {passive:true});
-const burger = document.getElementById('burger'), overlay = document.getElementById('overlay');
-const closeOv = () => { overlay.classList.remove('open'); burger.classList.remove('on'); document.body.style.overflow=''; };
-burger.addEventListener('click', () => {
-  const o = overlay.classList.toggle('open'); burger.classList.toggle('on', o);
-  document.body.style.overflow = o ? 'hidden' : '';
-});
-overlay.querySelectorAll('a').forEach(a => a.addEventListener('click', closeOv));
-overlay.addEventListener('click', e => { if (e.target === overlay) closeOv(); });
-
-/* ─── Reveal ─── */
-const io = new IntersectionObserver(es => es.forEach((e,i) => {
-  if (e.isIntersecting) { setTimeout(() => e.target.classList.add('v'), i*55); io.unobserve(e.target); }
-}), {threshold:.08, rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.r').forEach(el => io.observe(el));
-
-/* ─── Modal ─── */
-const PROJECTS = [];
-const modal = document.getElementById('modal'), mImgWrap = document.getElementById('mImgWrap');
-function openModal(p) {
-  const m = getMeta(p.title, p.cat);
-  document.getElementById('mCat').textContent = (m.cat || p.cat);
-  document.getElementById('mTitle').textContent = p.title;
-  document.getElementById('mDesc').textContent = m.desc;
-  document.getElementById('mTools').innerHTML = m.tools.map(t => `<span class="m-tool">${t}</span>`).join('');
-  document.getElementById('mProcess').innerHTML = m.process.map((s,i) =>
-    `<div class="step"><div class="step-num">${i+1}</div><h4 class="step-title">${s[0]}</h4><p class="step-desc">${s[1]}</p></div>`).join('');
-  mImgWrap.innerHTML = p.type === 'glb'
-    ? `<model-viewer src="${p.src}" alt="${p.title}" auto-rotate camera-controls shadow-intensity="0" exposure="1"></model-viewer>`
-    : `<img src="${p.src}" alt="${p.title}">`;
-  modal.classList.add('open'); document.body.style.overflow = 'hidden';
+  );
 }
-function closeModal() { modal.classList.remove('open'); document.body.style.overflow=''; mImgWrap.innerHTML=''; }
-document.getElementById('modalClose').addEventListener('click', closeModal);
-modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
-addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-document.getElementById('work').addEventListener('click', e => {
-  const c = e.target.closest('.card');
-  if (c && c.dataset.i != null) openModal(PROJECTS[+c.dataset.i]);
-});
-
-/* ─── Loaders ─── */
-async function loadFolder(folder) {
-  try {
-    const res = await fetch(`${API}/${folder}`);
-    const files = await res.json();
-    if (!Array.isArray(files)) return {imgs:[], glbs:[]};
-    return {
-      imgs: files.filter(f => f.type==='file' && IMGS.test(f.name)),
-      glbs: files.filter(f => f.type==='file' && GLBS.test(f.name))
-    };
-  } catch(e) { return {imgs:[], glbs:[]}; }
-}
-
-function renderGrid(gridId, countId, projects) {
-  const grid = document.getElementById(gridId);
-  if (!projects.length) {
-    grid.innerHTML = '<p class="empty">No files yet — add some to this folder.</p>';
-    document.getElementById(countId).textContent = '–';
-    return;
-  }
-  grid.innerHTML = projects.map(p => {
-    const i = PROJECTS.length; PROJECTS.push(p);
-    const media = p.type === 'glb'
-      ? `<div class="card-img"><model-viewer src="${p.src}" auto-rotate interaction-prompt="none" shadow-intensity="0" exposure="1" style="width:100%;height:100%;background:transparent;pointer-events:none"></model-viewer></div>`
-      : `<div class="card-img"><img src="${p.src}" alt="${p.title}" loading="lazy"></div>`;
-    return `<div class="card" data-i="${i}">${media}<div class="card-body"><p class="card-cat">${p.cat}</p><h3 class="card-title">${p.title}</h3></div></div>`;
-  }).join('');
-  document.getElementById(countId).textContent = projects.length === 1 ? '1 project' : `${projects.length} projects`;
-}
-
-async function loadWork() {
-  const mk = (folder, name, cat, type) => ({src:`${RAW}/${folder}/${name}`, title:clean(name), cat, type});
-
-  const td = await loadFolder(FOLDERS['3d']);
-  const tdP = [...td.glbs.map(f => mk(FOLDERS['3d'], f.name, '3D Design', 'glb')),
-               ...td.imgs.map(f => mk(FOLDERS['3d'], f.name, '3D Design', 'img'))];
-  renderGrid('g3d', 'c3d', tdP);
-
-  const gr = await loadFolder(FOLDERS.graphic);
-  const grP = gr.imgs.map(f => mk(FOLDERS.graphic, f.name, 'Graphic Design', 'img'));
-  renderGrid('ggr', 'cgr', grP);
-
-  const mo = await loadFolder(FOLDERS.motion);
-  const moP = mo.imgs.map(f => mk(FOLDERS.motion, f.name, 'Motion', 'img'));
-  renderGrid('gmo', 'cmo', moP);
-
-  const total = tdP.length + grP.length + moP.length;
-  document.getElementById('projCount').innerHTML = `${total||6}<span style="color:var(--blue)">+</span>`;
-}
-
-const FALLBACK_BRANDS = ['Bata','ME','EmailBoost','TURSIAN','Myanmar Sporting House','Ona Printing House'];
-async function loadBrands() {
-  const grid = document.getElementById('brandGrid');
-  const { imgs } = await loadFolder(FOLDERS.brands);
-  if (imgs.length) {
-    grid.innerHTML = imgs.map(f => `<img class="brand-logo" src="${RAW}/${FOLDERS.brands}/${f.name}" alt="${clean(f.name)}" loading="lazy">`).join('');
-  } else {
-    grid.innerHTML = FALLBACK_BRANDS.map(b => `<span class="brand-text">${b}</span>`).join('');
-  }
-}
-
-loadWork();
-loadBrands();
-</script>
-</body>
-</html>
