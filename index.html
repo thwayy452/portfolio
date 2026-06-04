@@ -1,429 +1,803 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thwvy — Graphic Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ─── RESET ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', 'Segoe UI', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; display: block; }
+    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    ::placeholder { color: rgba(255,255,255,0.25); }
 
-const HERO_SLIDES = [
-  {
-    id: 1,
-    title: "Hi, I'm Thwvy.",
-    subtitle: "I make 3D designs, Graphics, Motion & Window Display — crafting visuals that feel alive and real.",
-    cta1: "See My Work",
-    cta2: "Let's Talk",
-    bg: "linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%)",
-    accent: "#111",
-  },
-  {
-    id: 2,
-    title: "Projects",
-    subtitle: "I make 3D designs, Graphics, Motion & Window Display — crafting visuals that feel alive and real.",
-    cta1: "View Projects",
-    cta2: "Contact Me",
-    bg: "linear-gradient(135deg, #f0f5ff 0%, #dbe4ff 100%)",
-    accent: "#1a1a2e",
-  },
-  {
-    id: 3,
-    title: "Let's Collaborate",
-    subtitle: "I'll create a website that fulfills your business goals. Ready to bring your ideas to life?",
-    cta1: "Get Started",
-    cta2: "Learn More",
-    bg: "linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)",
-    accent: "#fff",
-  },
-];
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0a; }
+    ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 
-const BRANDS = ["Bata", "CNi", "EmailBoost", "TURSIAN", "BrowseStoriesToo", "QMark"];
+    /* ─── NAV ─── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: rgba(10,10,10,0.88);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 22px; letter-spacing: -0.5px;
+    }
+    .nav-links { display: flex; align-items: center; gap: 32px; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-dropdown { position: relative; }
+    .nav-dropdown-toggle {
+      font-size: 14px; font-weight: 500;
+      color: rgba(255,255,255,0.5);
+      display: flex; align-items: center; gap: 5px;
+      transition: color 0.2s;
+    }
+    .nav-dropdown:hover .nav-dropdown-toggle { color: #fff; }
+    .nav-dropdown-menu {
+      position: absolute; top: calc(100% + 10px); left: 0;
+      background: #1a1a1a; border-radius: 12px;
+      padding: 6px 0; min-width: 150px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      opacity: 0; visibility: hidden;
+      transform: translateY(6px);
+      transition: all 0.25s ease;
+    }
+    .nav-dropdown:hover .nav-dropdown-menu {
+      opacity: 1; visibility: visible; transform: translateY(0);
+    }
+    .nav-dropdown-menu a {
+      display: block; padding: 10px 20px; font-size: 13px;
+      color: rgba(255,255,255,0.6);
+      transition: all 0.15s;
+    }
+    .nav-dropdown-menu a:hover {
+      background: rgba(255,255,255,0.05); color: #fff;
+    }
+    .nav-cta {
+      background: #22c55e; color: #000 !important;
+      padding: 8px 20px; border-radius: 20px;
+      font-size: 13px; font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .nav-cta:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(34,197,94,0.3);
+    }
 
-const PROJECTS = [
-  { title: "Tennis\nRackets", color: "#1a3a2a", emoji: "🎾" },
-  { title: "Gym\nDumbbells", color: "#1a2a3a", emoji: "🏋️" },
-  { title: "Badminton\nBalls", color: "#2a3a1a", emoji: "🏸" },
-  { title: "Boxing\nGloves", color: "#1a1a2a", emoji: "🥊" },
-];
+    /* Mobile menu toggle */
+    .nav-burger { display: none; flex-direction: column; gap: 5px; padding: 4px; }
+    .nav-burger span {
+      display: block; width: 22px; height: 2px;
+      background: #fff; border-radius: 2px;
+      transition: all 0.3s;
+    }
 
-const STATS = [
-  { number: "50+", label: "Projects Completed" },
-  { number: "20+", label: "Happy Clients" },
-  { number: "3+", label: "Years Experience" },
-  { number: "∞", label: "Ideas to Build" },
-];
+    /* ─── HERO BANNER ─── */
+    .hero { padding-top: 64px; position: relative; }
+    .banner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 7;
+      max-height: 640px;
+      overflow: hidden;
+      background: #111;
+    }
+    .banner-slide {
+      position: absolute; inset: 0;
+      opacity: 0;
+      transition: opacity 0.7s ease, transform 0.9s ease;
+      transform: scale(1.03);
+    }
+    .banner-slide.active {
+      opacity: 1; transform: scale(1); z-index: 2;
+    }
+    /* Image-only slides */
+    .banner-slide img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+    }
+    /* Text slide */
+    .banner-slide--text {
+      display: flex; align-items: center;
+      background-size: cover; background-position: center;
+    }
+    .banner-text {
+      position: relative; z-index: 2;
+      padding: 0 clamp(28px, 6vw, 100px);
+      max-width: 720px;
+    }
+    .banner-text h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(32px, 6.5vw, 72px);
+      font-weight: 700; line-height: 1.05;
+      color: #111; margin-bottom: 20px;
+      letter-spacing: -1px;
+    }
+    .banner-text p {
+      font-size: clamp(15px, 2.2vw, 20px);
+      color: rgba(0,0,0,0.6); line-height: 1.55;
+      margin-bottom: 32px;
+    }
+    .banner-text p strong { color: #111; font-weight: 700; }
+    .banner-text .btn-outline {
+      display: inline-block;
+      padding: 14px 32px; border-radius: 32px;
+      border: 2px solid #222; color: #222;
+      font-size: 15px; font-weight: 600;
+      transition: all 0.25s;
+    }
+    .banner-text .btn-outline:hover {
+      background: #222; color: #fff;
+    }
 
-const WORK_ITEMS = [
-  { title: "Pathways", desc: "Dive into a world of knowledge tailored to your goals. Content-branded courses.", tags: ["Coding", "Design", "Health"], color: "#1a3a2a" },
-  { title: "Teamwork", desc: "We offer cutting-edge tools and techniques available.", color: "#f5f5f0", dark: true },
-  { title: "Discover learning path", desc: "Stay organized and on track with your personalized learning.", color: "#e8edf5" },
-];
+    /* Dots */
+    .banner-dots {
+      position: absolute; bottom: 24px;
+      left: 50%; transform: translateX(-50%);
+      display: flex; gap: 10px; z-index: 10;
+    }
+    .banner-dot {
+      width: 10px; height: 10px; border-radius: 5px;
+      background: rgba(255,255,255,0.35);
+      transition: all 0.35s ease;
+      cursor: pointer; border: none; padding: 0;
+    }
+    .banner-dot.active {
+      width: 28px; background: #111;
+    }
+    /* For light bg slides, dark dots. For dark slides, light dots. */
+    .banner-dots[data-theme="light"] .banner-dot { background: rgba(0,0,0,0.2); }
+    .banner-dots[data-theme="light"] .banner-dot.active { background: #111; }
 
-export default function Portfolio() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const [activeNav, setActiveNav] = useState("Home");
-  const [projectsDropdown, setProjectsDropdown] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [visibleSections, setVisibleSections] = useState({});
-  const timerRef = useRef(null);
+    /* Arrows */
+    .banner-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(0,0,0,0.25); backdrop-filter: blur(8px);
+      color: #fff; font-size: 18px; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .banner-arrow:hover { background: rgba(0,0,0,0.55); }
+    .banner-arrow--prev { left: 16px; }
+    .banner-arrow--next { right: 16px; }
 
-  const goToSlide = useCallback((index) => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentSlide(index);
-    setTimeout(() => setIsTransitioning(false), 600);
-  }, [isTransitioning]);
+    /* ─── ABOUT BLURB ─── */
+    .about-blurb {
+      max-width: 820px; margin: 0 auto;
+      padding: 72px 24px 48px; text-align: center;
+    }
+    .about-blurb p {
+      font-size: clamp(16px, 2.4vw, 20px);
+      color: rgba(255,255,255,0.6); line-height: 1.7;
+    }
+    .about-blurb strong { color: #fff; }
 
-  const nextSlide = useCallback(() => {
-    goToSlide((currentSlide + 1) % HERO_SLIDES.length);
-  }, [currentSlide, goToSlide]);
+    /* ─── WORK GRID ─── */
+    .work { max-width: 1200px; margin: 0 auto; padding: 24px 24px 72px; }
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-bottom: 14px;
+    }
+    .work-card {
+      background: #1a3a2a; border-radius: 20px;
+      padding: 28px; min-height: 230px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .work-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    .work-card--light { background: #f5f5f0; }
+    .work-card--muted { background: #e8edf5; }
+    .work-card__badge {
+      font-size: 11px; font-weight: 600;
+      color: rgba(255,255,255,0.35);
+      text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .work-card--light .work-card__badge,
+    .work-card--muted .work-card__badge { color: rgba(0,0,0,0.3); }
+    .work-card__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700; color: #fff;
+      margin: 12px 0 8px; line-height: 1.25;
+    }
+    .work-card--light .work-card__title,
+    .work-card--muted .work-card__title { color: #111; }
+    .work-card__desc {
+      font-size: 13px; line-height: 1.5;
+      color: rgba(255,255,255,0.55);
+    }
+    .work-card--light .work-card__desc,
+    .work-card--muted .work-card__desc { color: rgba(0,0,0,0.5); }
+    .work-card__tags { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+    .work-card__tag {
+      padding: 6px 14px; border-radius: 20px;
+      background: rgba(255,255,255,0.12);
+      color: #fff; font-size: 12px; font-weight: 500;
+    }
 
-  useEffect(() => {
-    timerRef.current = setInterval(nextSlide, 5000);
-    return () => clearInterval(timerRef.current);
-  }, [nextSlide]);
+    /* Full-width feature card */
+    .work-feature {
+      background: linear-gradient(135deg, #1a3a2a, #0f2518);
+      border-radius: 20px; padding: 40px;
+      position: relative; overflow: hidden;
+      min-height: 200px; border: 1px solid rgba(255,255,255,0.06);
+    }
+    .work-feature__wave {
+      position: absolute; inset: 0; opacity: 0.08;
+      background: repeating-conic-gradient(
+        rgba(255,255,255,0.03) 0% 25%, transparent 0% 50%
+      );
+    }
+    .work-feature__content { position: relative; z-index: 2; }
+    .work-feature__new {
+      display: inline-block;
+      background: #22c55e; color: #000;
+      padding: 4px 12px; border-radius: 4px;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .work-feature__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(26px, 4vw, 36px);
+      font-weight: 700; color: #fff;
+      margin: 16px 0 24px; line-height: 1.15;
+    }
+    .work-feature__btns { display: flex; gap: 8px; }
+    .work-feature__btn {
+      padding: 10px 22px; border-radius: 20px;
+      font-size: 13px; font-weight: 600;
+    }
+    .work-feature__btn--primary { background: #22c55e; color: #000; }
+    .work-feature__btn--ghost {
+      background: rgba(255,255,255,0.1); color: #fff;
+    }
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => ({ ...prev, [entry.target.id]: true }));
-          }
-        });
-      },
-      { threshold: 0.15 }
-    );
-    document.querySelectorAll("[data-animate]").forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+    /* ─── BRANDS ─── */
+    .brands {
+      padding: 44px 24px; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .brands__label {
+      font-size: 14px; font-weight: 600;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 28px; letter-spacing: 0.5px;
+    }
+    .brands__row {
+      display: flex; justify-content: center; align-items: center;
+      gap: clamp(20px, 5vw, 52px); flex-wrap: wrap;
+      max-width: 850px; margin: 0 auto;
+    }
+    .brands__row img {
+      height: 28px; width: auto;
+      opacity: 0.3; filter: brightness(0) invert(1);
+      transition: opacity 0.3s;
+    }
+    .brands__row img:hover { opacity: 0.7; }
 
-  const slide = HERO_SLIDES[currentSlide];
-  const isLight = currentSlide !== 2;
+    /* ─── PROJECTS GRID ─── */
+    .projects { max-width: 1200px; margin: 0 auto; padding: 72px 24px; }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+    .project-card {
+      border-radius: 20px; padding: 28px;
+      min-height: 210px; display: flex; flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid rgba(255,255,255,0.06);
+      transition: transform 0.3s;
+      cursor: pointer; position: relative; overflow: hidden;
+    }
+    .project-card:hover { transform: translateY(-4px); }
+    .project-card__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(20px, 3vw, 26px);
+      font-weight: 700; color: #fff; line-height: 1.2;
+    }
+    .project-card__bottom {
+      display: flex; justify-content: space-between;
+      align-items: flex-end;
+    }
+    .project-card__link {
+      color: #22c55e; font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .project-card__emoji {
+      font-size: clamp(44px, 6vw, 60px); line-height: 1; opacity: 0.55;
+    }
 
-  return (
-    <div style={{ fontFamily: "'DM Sans', 'Segoe UI', sans-serif", background: "#0a0a0a", color: "#fff", minHeight: "100vh", overflowX: "hidden" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    /* ─── STATS ─── */
+    .stats {
+      max-width: 800px; margin: 0 auto;
+      padding: 24px 24px 80px;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 16px; text-align: center;
+    }
+    .stat__number {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(28px, 5vw, 44px);
+      font-weight: 700; color: #22c55e;
+    }
+    .stat__label {
+      font-size: 12px; color: rgba(255,255,255,0.35);
+      margin-top: 4px;
+    }
 
-      {/* NAV */}
-      <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1000, background: "rgba(10,10,10,0.85)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
-          <span style={{ fontFamily: "'Space Grotesk', sans-serif", fontWeight: 700, fontSize: 22, letterSpacing: -0.5 }}>Thwvy.</span>
-          <div style={{ display: "flex", gap: 32, alignItems: "center" }}>
-            {["Home", "My Projects", "About", "Contact"].map((item) => (
-              <div key={item} style={{ position: "relative" }}>
-                {item === "My Projects" ? (
-                  <button
-                    onClick={() => setProjectsDropdown(!projectsDropdown)}
-                    style={{ background: "none", border: "none", color: activeNav === item ? "#fff" : "rgba(255,255,255,0.5)", cursor: "pointer", fontSize: 14, fontWeight: 500, fontFamily: "inherit", display: "flex", alignItems: "center", gap: 4 }}
-                  >
-                    {item} <span style={{ fontSize: 10, transform: projectsDropdown ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}>▼</span>
-                  </button>
-                ) : (
-                  <a
-                    href={`#${item.toLowerCase()}`}
-                    onClick={() => setActiveNav(item)}
-                    style={{ color: activeNav === item ? "#fff" : "rgba(255,255,255,0.5)", textDecoration: "none", fontSize: 14, fontWeight: 500, transition: "color 0.2s" }}
-                  >
-                    {item}
-                  </a>
-                )}
-                {item === "My Projects" && projectsDropdown && (
-                  <div style={{ position: "absolute", top: "100%", left: 0, marginTop: 8, background: "#1a1a1a", borderRadius: 12, padding: "8px 0", minWidth: 150, boxShadow: "0 16px 48px rgba(0,0,0,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}>
-                    {["3D", "Graphic", "Motion"].map((sub) => (
-                      <a key={sub} href="#work" style={{ display: "block", padding: "10px 20px", color: "rgba(255,255,255,0.7)", textDecoration: "none", fontSize: 13, transition: "all 0.2s" }}
-                        onMouseEnter={(e) => { e.target.style.background = "rgba(255,255,255,0.05)"; e.target.style.color = "#fff"; }}
-                        onMouseLeave={(e) => { e.target.style.background = "transparent"; e.target.style.color = "rgba(255,255,255,0.7)"; }}
-                      >{sub}</a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <a href="#contact" style={{ background: "#22c55e", color: "#000", padding: "8px 20px", borderRadius: 20, fontSize: 13, fontWeight: 600, textDecoration: "none", transition: "transform 0.2s, box-shadow 0.2s" }}
-              onMouseEnter={(e) => { e.target.style.transform = "translateY(-1px)"; e.target.style.boxShadow = "0 4px 16px rgba(34,197,94,0.3)"; }}
-              onMouseLeave={(e) => { e.target.style.transform = "none"; e.target.style.boxShadow = "none"; }}
-            >Get in touch →</a>
+    /* ─── CONTACT ─── */
+    .contact {
+      background: linear-gradient(180deg, #0a0a0a, #111);
+      padding: 80px 24px;
+    }
+    .contact-inner {
+      max-width: 580px; margin: 0 auto; text-align: center;
+    }
+    .contact__eyebrow {
+      font-size: 12px; font-weight: 600; color: #22c55e;
+      text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .contact__title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(26px, 5vw, 40px);
+      font-weight: 700; color: #fff;
+      margin-bottom: 12px; line-height: 1.15;
+    }
+    .contact__sub {
+      font-size: 14px; color: rgba(255,255,255,0.45);
+      margin-bottom: 40px;
+    }
+    .contact-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 12px; margin-bottom: 12px;
+    }
+    .contact input, .contact textarea {
+      width: 100%; padding: 14px 18px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #fff; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .contact input:focus, .contact textarea:focus {
+      border-color: #22c55e;
+    }
+    .contact textarea { resize: vertical; margin-bottom: 16px; }
+    .contact-submit {
+      width: 100%; padding: 16px; border-radius: 10px;
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #fff; font-size: 15px; font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .contact-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(34,197,94,0.3);
+    }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 32px 24px;
+    }
+    .footer-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 16px;
+    }
+    .footer-copy {
+      font-size: 13px; color: rgba(255,255,255,0.25);
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 13px; color: rgba(255,255,255,0.25);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #fff; }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .fade-up {
+      opacity: 0; transform: translateY(36px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .work-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      /* Nav */
+      .nav-links {
+        position: fixed; top: 64px; left: 0; right: 0;
+        background: rgba(10,10,10,0.96);
+        backdrop-filter: blur(24px);
+        flex-direction: column; gap: 0; padding: 8px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        transform: translateY(-120%);
+        transition: transform 0.35s ease;
+      }
+      .nav-links.open { transform: translateY(0); }
+      .nav-links a, .nav-dropdown-toggle {
+        padding: 14px 24px; width: 100%;
+        font-size: 15px;
+      }
+      .nav-cta {
+        margin: 8px 24px 16px; text-align: center;
+        display: block;
+      }
+      .nav-burger { display: flex; }
+      .nav-dropdown-menu {
+        position: static; opacity: 1; visibility: visible;
+        transform: none; box-shadow: none;
+        background: rgba(255,255,255,0.03);
+        border: none; border-radius: 0;
+        display: none;
+      }
+      .nav-dropdown.open .nav-dropdown-menu { display: block; }
+
+      /* Banner */
+      .banner { aspect-ratio: 4 / 3; max-height: 480px; }
+      .banner-arrow { width: 36px; height: 36px; font-size: 14px; }
+      .banner-arrow--prev { left: 8px; }
+      .banner-arrow--next { right: 8px; }
+      .banner-text { padding: 0 24px; }
+      .banner-text h1 { margin-bottom: 14px; }
+      .banner-text p { margin-bottom: 24px; }
+      .banner-text .btn-outline { padding: 12px 24px; font-size: 14px; }
+
+      /* Grids */
+      .work-grid { grid-template-columns: 1fr; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+      .contact-row { grid-template-columns: 1fr; }
+
+      /* Feature card */
+      .work-feature { padding: 28px; }
+    }
+
+    @media (max-width: 480px) {
+      .banner { aspect-ratio: 3 / 4; max-height: 520px; }
+      .banner-text h1 { font-size: 28px; }
+      .banner-text p { font-size: 14px; }
+      .brands__row img { height: 20px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══════════ NAV ═══════════ -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">Thwvy.</a>
+
+      <button class="nav-burger" id="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav-links" id="navLinks">
+        <a href="#home" class="active">Home</a>
+        <div class="nav-dropdown" id="projDropdown">
+          <button class="nav-dropdown-toggle">
+            My Projects <svg width="10" height="6" viewBox="0 0 10 6" fill="none" style="margin-left:2px"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="https://thwayy452.github.io/my-portfolio/3d.html">3D</a>
+            <a href="https://thwayy452.github.io/my-portfolio/graphic.html">Graphic</a>
+            <a href="https://thwayy452.github.io/my-portfolio/animation.html">Motion</a>
           </div>
         </div>
-      </nav>
-
-      {/* HERO BANNER CAROUSEL */}
-      <section id="home" style={{ paddingTop: 64, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "relative", height: "min(85vh, 640px)", overflow: "hidden" }}>
-          {HERO_SLIDES.map((s, i) => (
-            <div
-              key={s.id}
-              style={{
-                position: "absolute", inset: 0,
-                background: s.bg,
-                opacity: currentSlide === i ? 1 : 0,
-                transform: currentSlide === i ? "scale(1)" : "scale(1.05)",
-                transition: "opacity 0.6s ease, transform 0.8s ease",
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}
-            >
-              <div style={{ maxWidth: 700, textAlign: "center", padding: "0 24px", transform: currentSlide === i ? "translateY(0)" : "translateY(30px)", opacity: currentSlide === i ? 1 : 0, transition: "all 0.6s ease 0.2s" }}>
-                {i === 2 && (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "center", marginBottom: 12 }}>
-                    <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14 }}>👤</div>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.8)" }}>Mark Vassilevsky</span>
-                  </div>
-                )}
-                <h1 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(36px, 6vw, 64px)", fontWeight: 700, color: s.accent, lineHeight: 1.1, margin: "0 0 20px" }}>
-                  {s.title}
-                </h1>
-                <p style={{ fontSize: "clamp(14px, 2vw, 17px)", color: isLight && i !== 2 ? "rgba(0,0,0,0.6)" : "rgba(255,255,255,0.8)", lineHeight: 1.6, margin: "0 0 32px", maxWidth: 520, marginLeft: "auto", marginRight: "auto" }}>
-                  {s.subtitle}
-                </p>
-                <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                  <a href="#work" style={{ padding: "12px 28px", borderRadius: 8, background: i === 2 ? "#fff" : "#111", color: i === 2 ? "#f7931e" : "#fff", fontSize: 14, fontWeight: 600, textDecoration: "none", border: "none", transition: "transform 0.2s" }}
-                    onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-                    onMouseLeave={(e) => e.target.style.transform = "none"}
-                  >{s.cta1}</a>
-                  <a href="#contact" style={{ padding: "12px 28px", borderRadius: 8, background: "transparent", color: i === 2 ? "#fff" : "#111", fontSize: 14, fontWeight: 600, textDecoration: "none", border: `1.5px solid ${i === 2 ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.2)"}`, transition: "transform 0.2s" }}
-                    onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-                    onMouseLeave={(e) => e.target.style.transform = "none"}
-                  >{s.cta2}</a>
-                </div>
-              </div>
-              {/* Decorative elements per slide */}
-              {i === 0 && (
-                <>
-                  <div style={{ position: "absolute", top: "15%", right: "10%", width: 120, height: 120, background: "linear-gradient(135deg, #4ecdc4, #44bd89)", borderRadius: 20, transform: "rotate(15deg)", opacity: 0.7, animation: "float 4s ease-in-out infinite" }} />
-                  <div style={{ position: "absolute", bottom: "20%", right: "15%", width: 60, height: 60, background: "#2563eb", borderRadius: "50%", opacity: 0.5, animation: "float 3s ease-in-out infinite 1s" }} />
-                  <div style={{ position: "absolute", top: "30%", right: "20%", fontSize: 40 }}>✓</div>
-                </>
-              )}
-              {i === 1 && (
-                <>
-                  <div style={{ position: "absolute", top: "20%", left: "8%", width: 100, height: 130, background: "linear-gradient(to bottom, #a8e6cf, #88d8b0)", borderRadius: 12, opacity: 0.6, animation: "float 5s ease-in-out infinite" }} />
-                  <div style={{ position: "absolute", bottom: "25%", left: "12%", width: 80, height: 80, background: "#ff6b6b", borderRadius: 16, transform: "rotate(-10deg)", opacity: 0.5, animation: "float 4s ease-in-out infinite 0.5s" }} />
-                </>
-              )}
-            </div>
-          ))}
-
-          {/* Dots */}
-          <div style={{ position: "absolute", bottom: 28, left: "50%", transform: "translateX(-50%)", display: "flex", gap: 10, zIndex: 10 }}>
-            {HERO_SLIDES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goToSlide(i)}
-                style={{
-                  width: currentSlide === i ? 28 : 10, height: 10,
-                  borderRadius: 5,
-                  background: currentSlide === i ? (isLight ? "#111" : "#fff") : "rgba(128,128,128,0.4)",
-                  border: "none", cursor: "pointer",
-                  transition: "all 0.3s ease",
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Arrows */}
-          <button onClick={() => goToSlide((currentSlide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length)}
-            style={{ position: "absolute", left: 20, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "background 0.2s" }}
-            onMouseEnter={(e) => e.target.style.background = "rgba(0,0,0,0.6)"}
-            onMouseLeave={(e) => e.target.style.background = "rgba(0,0,0,0.3)"}
-          >←</button>
-          <button onClick={() => goToSlide((currentSlide + 1) % HERO_SLIDES.length)}
-            style={{ position: "absolute", right: 20, top: "50%", transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "rgba(0,0,0,0.3)", border: "none", color: "#fff", fontSize: 18, cursor: "pointer", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, transition: "background 0.2s" }}
-            onMouseEnter={(e) => e.target.style.background = "rgba(0,0,0,0.6)"}
-            onMouseLeave={(e) => e.target.style.background = "rgba(0,0,0,0.3)"}
-          >→</button>
-        </div>
-      </section>
-
-      {/* ABOUT */}
-      <section id="about" data-animate style={{ maxWidth: 900, margin: "0 auto", padding: "80px 24px 40px", textAlign: "center", opacity: visibleSections["about"] ? 1 : 0, transform: visibleSections["about"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
-        <p style={{ fontSize: "clamp(16px, 2.5vw, 20px)", color: "rgba(255,255,255,0.7)", lineHeight: 1.7 }}>
-          Every project is built with <strong style={{ color: "#fff" }}>clean thinking</strong> and a <strong style={{ color: "#fff" }}>focus</strong> on what actually looks great. Open to freelance projects and creative collaborations.
-        </p>
-      </section>
-
-      {/* SELECTED WORK */}
-      <section id="work" data-animate style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px 80px", opacity: visibleSections["work"] ? 1 : 0, transform: visibleSections["work"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, marginBottom: 16 }}>
-          {WORK_ITEMS.map((item, i) => (
-            <div key={i} style={{
-              background: item.color,
-              borderRadius: 20,
-              padding: 28,
-              minHeight: 220,
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-              border: item.dark ? "1px solid rgba(0,0,0,0.08)" : "1px solid rgba(255,255,255,0.08)",
-              transition: "transform 0.3s ease, box-shadow 0.3s ease",
-              cursor: "pointer",
-            }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 60px rgba(0,0,0,0.3)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
-            >
-              <div>
-                <span style={{ fontSize: 11, fontWeight: 600, color: item.dark ? "rgba(0,0,0,0.4)" : "rgba(255,255,255,0.4)", textTransform: "uppercase", letterSpacing: 1.5 }}>✦ Polymorph</span>
-                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 22, fontWeight: 700, color: item.dark ? "#111" : "#fff", margin: "12px 0 8px" }}>{item.title}</h3>
-                <p style={{ fontSize: 13, color: item.dark ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{item.desc}</p>
-              </div>
-              {item.tags && (
-                <div style={{ display: "flex", gap: 8, marginTop: 16, flexWrap: "wrap" }}>
-                  {item.tags.map((t) => (
-                    <span key={t} style={{ padding: "6px 14px", borderRadius: 20, background: "rgba(255,255,255,0.15)", color: "#fff", fontSize: 12, fontWeight: 500 }}>{t}</span>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* New-packed education card */}
-        <div style={{
-          background: "linear-gradient(135deg, #1a3a2a 0%, #0f2518 100%)",
-          borderRadius: 20, padding: 36, marginTop: 16,
-          position: "relative", overflow: "hidden",
-          minHeight: 200,
-        }}>
-          <div style={{ position: "absolute", inset: 0, background: "url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 600 300\"><path d=\"M0,150 Q150,50 300,150 T600,150\" fill=\"none\" stroke=\"rgba(255,255,255,0.05)\" stroke-width=\"2\"/><path d=\"M0,170 Q150,70 300,170 T600,170\" fill=\"none\" stroke=\"rgba(255,255,255,0.03)\" stroke-width=\"2\"/></svg>') center/cover" }} />
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <span style={{ background: "#22c55e", color: "#000", padding: "4px 12px", borderRadius: 4, fontSize: 11, fontWeight: 700 }}>New</span>
-            <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 32, fontWeight: 700, color: "#fff", margin: "16px 0 20px", lineHeight: 1.2 }}>New-packed<br />education</h3>
-            <div style={{ display: "flex", gap: 8 }}>
-              <span style={{ padding: "8px 20px", borderRadius: 20, background: "#22c55e", color: "#000", fontSize: 13, fontWeight: 600 }}>All topics</span>
-              <span style={{ padding: "8px 20px", borderRadius: 20, background: "rgba(255,255,255,0.1)", color: "#fff", fontSize: 13, fontWeight: 500 }}>Library</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* BRANDS */}
-      <section data-animate id="brands" style={{ padding: "40px 24px", textAlign: "center", borderTop: "1px solid rgba(255,255,255,0.06)", borderBottom: "1px solid rgba(255,255,255,0.06)", opacity: visibleSections["brands"] ? 1 : 0, transform: visibleSections["brands"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
-        <p style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.5)", marginBottom: 28, letterSpacing: 0.5 }}>Brands I worked with</p>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "clamp(24px, 5vw, 56px)", flexWrap: "wrap", maxWidth: 800, margin: "0 auto" }}>
-          {BRANDS.map((b) => (
-            <span key={b} style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(14px, 2vw, 18px)", fontWeight: 700, color: "rgba(255,255,255,0.25)", letterSpacing: 1, transition: "color 0.3s" }}
-              onMouseEnter={(e) => e.target.style.color = "rgba(255,255,255,0.6)"}
-              onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.25)"}
-            >{b}</span>
-          ))}
-        </div>
-      </section>
-
-      {/* PROJECTS GRID */}
-      <section data-animate id="projects" style={{ maxWidth: 1200, margin: "0 auto", padding: "80px 24px", opacity: visibleSections["projects"] ? 1 : 0, transform: visibleSections["projects"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
-          {PROJECTS.map((p, i) => (
-            <div key={i} style={{
-              background: `linear-gradient(145deg, ${p.color}, ${p.color}dd)`,
-              borderRadius: 20, padding: 28, minHeight: 200,
-              display: "flex", flexDirection: "column", justifyContent: "space-between",
-              position: "relative", overflow: "hidden",
-              cursor: "pointer", transition: "transform 0.3s ease",
-              border: "1px solid rgba(255,255,255,0.06)",
-            }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = "translateY(-4px)"}
-              onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
-            >
-              <div>
-                <h3 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: 24, fontWeight: 700, color: "#fff", lineHeight: 1.2, whiteSpace: "pre-line" }}>{p.title}</h3>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-                <a href="#" style={{ color: "#22c55e", fontSize: 13, fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
-                  ↗ LEARN MORE
-                </a>
-                <span style={{ fontSize: 56, opacity: 0.6, lineHeight: 1 }}>{p.emoji}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* STATS */}
-      <section data-animate id="stats" style={{ maxWidth: 800, margin: "0 auto", padding: "40px 24px 80px", opacity: visibleSections["stats"] ? 1 : 0, transform: visibleSections["stats"] ? "translateY(0)" : "translateY(40px)", transition: "all 0.8s ease" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, textAlign: "center" }}>
-          {STATS.map((s, i) => (
-            <div key={i}>
-              <div style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(28px, 5vw, 42px)", fontWeight: 700, color: "#22c55e" }}>{s.number}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CONTACT */}
-      <section id="contact" data-animate style={{
-        background: "linear-gradient(180deg, #0a0a0a 0%, #111 100%)",
-        padding: "80px 24px",
-        opacity: visibleSections["contact"] ? 1 : 0,
-        transform: visibleSections["contact"] ? "translateY(0)" : "translateY(40px)",
-        transition: "all 0.8s ease",
-      }}>
-        <div style={{ maxWidth: 600, margin: "0 auto", textAlign: "center" }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: "#22c55e", textTransform: "uppercase", letterSpacing: 2 }}>Contact</span>
-          <h2 style={{ fontFamily: "'Space Grotesk', sans-serif", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 700, margin: "12px 0 12px", color: "#fff" }}>Have a project in<br />mind?</h2>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", marginBottom: 40 }}>I'm open to new work. Send me a message and I'll reply within a day.</p>
-
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
-            <input
-              type="text" placeholder="Your name"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              style={{ padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", transition: "border 0.2s" }}
-              onFocus={(e) => e.target.style.borderColor = "#22c55e"}
-              onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
-            />
-            <input
-              type="email" placeholder="you@email.com"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              style={{ padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", transition: "border 0.2s" }}
-              onFocus={(e) => e.target.style.borderColor = "#22c55e"}
-              onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
-            />
-          </div>
-          <textarea
-            placeholder="Tell me about your project..."
-            rows={4}
-            value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            style={{ width: "100%", padding: "14px 18px", borderRadius: 10, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)", color: "#fff", fontSize: 14, fontFamily: "inherit", outline: "none", resize: "vertical", marginBottom: 16, boxSizing: "border-box", transition: "border 0.2s" }}
-            onFocus={(e) => e.target.style.borderColor = "#22c55e"}
-            onBlur={(e) => e.target.style.borderColor = "rgba(255,255,255,0.1)"}
-          />
-          <button style={{
-            width: "100%", padding: "16px", borderRadius: 10, border: "none",
-            background: "linear-gradient(135deg, #22c55e, #16a34a)", color: "#fff",
-            fontSize: 15, fontWeight: 600, fontFamily: "inherit", cursor: "pointer",
-            transition: "transform 0.2s, box-shadow 0.2s",
-          }}
-            onMouseEnter={(e) => { e.target.style.transform = "translateY(-2px)"; e.target.style.boxShadow = "0 8px 32px rgba(34,197,94,0.3)"; }}
-            onMouseLeave={(e) => { e.target.style.transform = "none"; e.target.style.boxShadow = "none"; }}
-          >Send message</button>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={{ borderTop: "1px solid rgba(255,255,255,0.06)", padding: "32px 24px" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,0.3)" }}>© 2026 Thwvy. All rights reserved.</span>
-          <div style={{ display: "flex", gap: 24 }}>
-            {["Instagram", "TikTok", "LinkedIn", "Discord", "Github"].map((s) => (
-              <a key={s} href="#" style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", textDecoration: "none", transition: "color 0.2s" }}
-                onMouseEnter={(e) => e.target.style.color = "#fff"}
-                onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.3)"}
-              >{s}</a>
-            ))}
-          </div>
-        </div>
-      </footer>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(15deg); }
-          50% { transform: translateY(-15px) rotate(15deg); }
-        }
-        * { box-sizing: border-box; margin: 0; }
-        html { scroll-behavior: smooth; }
-        ::placeholder { color: rgba(255,255,255,0.25); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #0a0a0a; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
-      `}</style>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+        <a href="#contact" class="nav-cta">Get in touch →</a>
+      </div>
     </div>
-  );
-}
+  </nav>
+
+  <!-- ═══════════ HERO BANNER ═══════════ -->
+  <section class="hero" id="home">
+    <div class="banner" id="banner">
+
+      <!-- Slide 1 — image only -->
+      <div class="banner-slide active" data-index="0">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page1.png"
+             alt="Featured work" loading="eager">
+      </div>
+
+      <!-- Slide 2 — image only -->
+      <div class="banner-slide" data-index="1">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page2.png"
+             alt="Featured project" loading="lazy">
+      </div>
+
+      <!-- Slide 3 — image background + text -->
+      <div class="banner-slide banner-slide--text" data-index="2"
+           style="background-image: url('https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page3.png')">
+        <div class="banner-text">
+          <h1>Hi, I'm Thwvy.</h1>
+          <p>I make <strong>3D designs</strong>, <strong>Graphics</strong>, <strong>Motion</strong> &amp;
+             <strong>Window Display</strong> — crafting visuals that feel alive and real.</p>
+          <a href="#work" class="btn-outline">See My Work</a>
+        </div>
+      </div>
+
+      <!-- Arrows -->
+      <button class="banner-arrow banner-arrow--prev" id="prevBtn">←</button>
+      <button class="banner-arrow banner-arrow--next" id="nextBtn">→</button>
+
+      <!-- Dots -->
+      <div class="banner-dots" id="bannerDots">
+        <button class="banner-dot active" data-slide="0"></button>
+        <button class="banner-dot" data-slide="1"></button>
+        <button class="banner-dot" data-slide="2"></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ ABOUT BLURB ═══════════ -->
+  <section class="about-blurb fade-up" id="about">
+    <p>Every project is built with <strong>clean thinking</strong> and a <strong>focus</strong> on what actually looks great. Open to freelance projects and creative collaborations.</p>
+  </section>
+
+  <!-- ═══════════ SELECTED WORK ═══════════ -->
+  <section class="work fade-up" id="work">
+    <div class="work-grid">
+      <div class="work-card">
+        <div>
+          <span class="work-card__badge">✦ Polymorph</span>
+          <h3 class="work-card__title">Pathways</h3>
+          <p class="work-card__desc">Dive into a world of knowledge tailored to your goals. Content-branded courses.</p>
+        </div>
+        <div class="work-card__tags">
+          <span class="work-card__tag">Coding</span>
+          <span class="work-card__tag">Design</span>
+          <span class="work-card__tag">Health</span>
+        </div>
+      </div>
+
+      <div class="work-card work-card--light">
+        <div>
+          <span class="work-card__badge">✦ Polymorph</span>
+          <h3 class="work-card__title">Teamwork</h3>
+          <p class="work-card__desc">We offer cutting-edge tools and techniques available for collaboration.</p>
+        </div>
+      </div>
+
+      <div class="work-card work-card--muted">
+        <div>
+          <span class="work-card__badge">✦ Polymorph</span>
+          <h3 class="work-card__title">Discover learning path</h3>
+          <p class="work-card__desc">Stay organized and on track with your personalized learning journey.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature card -->
+    <div class="work-feature">
+      <div class="work-feature__wave"></div>
+      <div class="work-feature__content">
+        <span class="work-feature__new">New</span>
+        <h3 class="work-feature__title">New-packed<br>education</h3>
+        <div class="work-feature__btns">
+          <span class="work-feature__btn work-feature__btn--primary">All topics</span>
+          <span class="work-feature__btn work-feature__btn--ghost">Library</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ BRANDS ═══════════ -->
+  <section class="brands fade-up">
+    <p class="brands__label">Brands I worked with</p>
+    <div class="brands__row">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Bata.svg" alt="Bata">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSE.svg" alt="MSE">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/theemailboost.svg" alt="The Email Boost">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/TURSIAN.svg" alt="Tursian">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSH.svg" alt="MSH">
+      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Oneprintinghouse.svg" alt="One Printing House">
+    </div>
+  </section>
+
+  <!-- ═══════════ PROJECTS ═══════════ -->
+  <section class="projects fade-up">
+    <div class="projects-grid">
+      <div class="project-card" style="background:linear-gradient(145deg,#1a3a2a,#153022)">
+        <h3 class="project-card__title">Tennis<br>Rackets</h3>
+        <div class="project-card__bottom">
+          <a href="#" class="project-card__link">↗ LEARN MORE</a>
+          <span class="project-card__emoji">🎾</span>
+        </div>
+      </div>
+
+      <div class="project-card" style="background:linear-gradient(145deg,#1a2a3a,#152535)">
+        <h3 class="project-card__title">Gym<br>Dumbbells</h3>
+        <div class="project-card__bottom">
+          <a href="#" class="project-card__link">↗ LEARN MORE</a>
+          <span class="project-card__emoji">🏋️</span>
+        </div>
+      </div>
+
+      <div class="project-card" style="background:linear-gradient(145deg,#2a3a1a,#223215)">
+        <h3 class="project-card__title">Badminton<br>Balls</h3>
+        <div class="project-card__bottom">
+          <a href="#" class="project-card__link">↗ LEARN MORE</a>
+          <span class="project-card__emoji">🏸</span>
+        </div>
+      </div>
+
+      <div class="project-card" style="background:linear-gradient(145deg,#1a1a2a,#151525)">
+        <h3 class="project-card__title">Boxing<br>Gloves</h3>
+        <div class="project-card__bottom">
+          <a href="#" class="project-card__link">↗ LEARN MORE</a>
+          <span class="project-card__emoji">🥊</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ STATS ═══════════ -->
+  <div class="stats fade-up">
+    <div>
+      <div class="stat__number">50+</div>
+      <div class="stat__label">Projects Completed</div>
+    </div>
+    <div>
+      <div class="stat__number">20+</div>
+      <div class="stat__label">Happy Clients</div>
+    </div>
+    <div>
+      <div class="stat__number">3+</div>
+      <div class="stat__label">Years Experience</div>
+    </div>
+    <div>
+      <div class="stat__number">∞</div>
+      <div class="stat__label">Ideas to Build</div>
+    </div>
+  </div>
+
+  <!-- ═══════════ CONTACT ═══════════ -->
+  <section class="contact fade-up" id="contact">
+    <div class="contact-inner">
+      <p class="contact__eyebrow">Contact</p>
+      <h2 class="contact__title">Have a project in<br>mind?</h2>
+      <p class="contact__sub">I'm open to new work. Send me a message and I'll reply within a day.</p>
+      <div class="contact-row">
+        <input type="text" placeholder="Your name">
+        <input type="email" placeholder="you@email.com">
+      </div>
+      <textarea rows="4" placeholder="Tell me about your project..."></textarea>
+      <button class="contact-submit">Send message</button>
+    </div>
+  </section>
+
+  <!-- ═══════════ FOOTER ═══════════ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="footer-copy">© 2026 Thwvy. All rights reserved.</span>
+      <div class="footer-links">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Discord</a>
+        <a href="#">Github</a>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- ═══════════ JAVASCRIPT ═══════════ -->
+  <script>
+    // ── Banner Carousel ──
+    const slides = document.querySelectorAll('.banner-slide');
+    const dots   = document.querySelectorAll('.banner-dot');
+    let current  = 0;
+    let transitioning = false;
+    let timer;
+
+    function goToSlide(n) {
+      if (transitioning || n === current) return;
+      transitioning = true;
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+      setTimeout(() => { transitioning = false; }, 750);
+      resetTimer();
+    }
+
+    function nextSlide() { goToSlide(current + 1); }
+    function prevSlide() { goToSlide(current - 1); }
+
+    function resetTimer() {
+      clearInterval(timer);
+      timer = setInterval(nextSlide, 5000);
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', nextSlide);
+    document.getElementById('prevBtn').addEventListener('click', prevSlide);
+    dots.forEach(d => d.addEventListener('click', () => goToSlide(+d.dataset.slide)));
+
+    // Touch swipe
+    let touchX = 0;
+    const banner = document.getElementById('banner');
+    banner.addEventListener('touchstart', e => { touchX = e.changedTouches[0].screenX; }, { passive: true });
+    banner.addEventListener('touchend', e => {
+      const diff = e.changedTouches[0].screenX - touchX;
+      if (Math.abs(diff) > 50) diff > 0 ? prevSlide() : nextSlide();
+    }, { passive: true });
+
+    resetTimer();
+
+    // ── Mobile Nav ──
+    const burger   = document.getElementById('burger');
+    const navLinks = document.getElementById('navLinks');
+    const projDrop = document.getElementById('projDropdown');
+
+    burger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // Mobile dropdown toggle
+    projDrop.querySelector('.nav-dropdown-toggle').addEventListener('click', () => {
+      if (window.innerWidth <= 768) {
+        projDrop.classList.toggle('open');
+      }
+    });
+
+    // Close mobile menu on link click
+    navLinks.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+
+    // ── Scroll Animations ──
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
