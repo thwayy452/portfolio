@@ -42,6 +42,10 @@
     .nav-logo {
       font-family: 'Space Grotesk', sans-serif;
       font-weight: 700; font-size: 22px; letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .nav-logo .dot {
+      color: #3b82f6;
     }
     .nav-links { display: flex; align-items: center; gap: 32px; }
     .nav-links a {
@@ -117,15 +121,29 @@
     .banner-slide.active {
       opacity: 1; transform: scale(1); z-index: 2;
     }
-    /* Image-only slides */
-    .banner-slide img {
+
+    /* Responsive images: show web by default, mobile on small screens */
+    .banner-slide .banner-img-web {
       width: 100%; height: 100%;
       object-fit: cover; object-position: center;
+      display: block;
     }
+    .banner-slide .banner-img-mobile {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      display: none;
+    }
+
     /* Text slide */
     .banner-slide--text {
       display: flex; align-items: center;
-      background-size: cover; background-position: center;
+    }
+    .banner-slide--text .banner-bg {
+      position: absolute; inset: 0; z-index: 0;
+    }
+    .banner-slide--text .banner-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
     }
     .banner-text {
       position: relative; z-index: 2;
@@ -171,9 +189,6 @@
     .banner-dot.active {
       width: 28px; background: #111;
     }
-    /* For light bg slides, dark dots. For dark slides, light dots. */
-    .banner-dots[data-theme="light"] .banner-dot { background: rgba(0,0,0,0.2); }
-    .banner-dots[data-theme="light"] .banner-dot.active { background: #111; }
 
     /* Arrows */
     .banner-arrow {
@@ -284,28 +299,43 @@
       background: rgba(255,255,255,0.1); color: #fff;
     }
 
-    /* ─── BRANDS ─── */
+    /* ─── BRANDS MARQUEE ─── */
     .brands {
-      padding: 44px 24px; text-align: center;
+      padding: 44px 0; text-align: center;
       border-top: 1px solid rgba(255,255,255,0.06);
       border-bottom: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
     }
     .brands__label {
       font-size: 14px; font-weight: 600;
       color: rgba(255,255,255,0.45);
       margin-bottom: 28px; letter-spacing: 0.5px;
+      padding: 0 24px;
     }
-    .brands__row {
-      display: flex; justify-content: center; align-items: center;
-      gap: clamp(20px, 5vw, 52px); flex-wrap: wrap;
-      max-width: 850px; margin: 0 auto;
+    .marquee {
+      display: flex;
+      width: max-content;
+      animation: marquee-scroll 25s linear infinite;
     }
-    .brands__row img {
+    .marquee:hover { animation-play-state: paused; }
+    .marquee__group {
+      display: flex;
+      align-items: center;
+      gap: clamp(36px, 6vw, 72px);
+      padding: 0 clamp(18px, 3vw, 36px);
+      flex-shrink: 0;
+    }
+    .marquee__group img {
       height: 28px; width: auto;
       opacity: 0.3; filter: brightness(0) invert(1);
       transition: opacity 0.3s;
+      flex-shrink: 0;
     }
-    .brands__row img:hover { opacity: 0.7; }
+    .marquee__group img:hover { opacity: 0.7; }
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
 
     /* ─── PROJECTS GRID ─── */
     .projects { max-width: 1200px; margin: 0 auto; padding: 72px 24px; }
@@ -468,8 +498,10 @@
       }
       .nav-dropdown.open .nav-dropdown-menu { display: block; }
 
-      /* Banner */
-      .banner { aspect-ratio: 4 / 3; max-height: 480px; }
+      /* Banner — swap to mobile images */
+      .banner { aspect-ratio: 9 / 16; max-height: 85vh; }
+      .banner-slide .banner-img-web { display: none; }
+      .banner-slide .banner-img-mobile { display: block; }
       .banner-arrow { width: 36px; height: 36px; font-size: 14px; }
       .banner-arrow--prev { left: 8px; }
       .banner-arrow--next { right: 8px; }
@@ -486,13 +518,16 @@
 
       /* Feature card */
       .work-feature { padding: 28px; }
+
+      /* Marquee slower on mobile */
+      .marquee { animation-duration: 18s; }
+      .marquee__group img { height: 22px; }
     }
 
     @media (max-width: 480px) {
-      .banner { aspect-ratio: 3 / 4; max-height: 520px; }
+      .banner { aspect-ratio: 9 / 16; max-height: 80vh; }
       .banner-text h1 { font-size: 28px; }
       .banner-text p { font-size: 14px; }
-      .brands__row img { height: 20px; }
       .footer-inner { flex-direction: column; text-align: center; }
       .footer-links { flex-wrap: wrap; justify-content: center; }
     }
@@ -503,7 +538,7 @@
   <!-- ═══════════ NAV ═══════════ -->
   <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">Thwvy.</a>
+      <a href="#" class="nav-logo">Thwvy<span class="dot">.</span></a>
 
       <button class="nav-burger" id="burger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -534,19 +569,34 @@
 
       <!-- Slide 1 — image only -->
       <div class="banner-slide active" data-index="0">
-        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page1.png"
+        <img class="banner-img-web"
+             src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/web%20banner/WPage1.png"
+             alt="Featured work" loading="eager">
+        <img class="banner-img-mobile"
+             src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/mobile%20banner/MPage1.png"
              alt="Featured work" loading="eager">
       </div>
 
       <!-- Slide 2 — image only -->
       <div class="banner-slide" data-index="1">
-        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page2.png"
+        <img class="banner-img-web"
+             src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/web%20banner/WPage2.png"
+             alt="Featured project" loading="lazy">
+        <img class="banner-img-mobile"
+             src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/mobile%20banner/MPage2.png"
              alt="Featured project" loading="lazy">
       </div>
 
-      <!-- Slide 3 — image background + text -->
-      <div class="banner-slide banner-slide--text" data-index="2"
-           style="background-image: url('https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/Page3.png')">
+      <!-- Slide 3 — image background + text overlay -->
+      <div class="banner-slide banner-slide--text" data-index="2">
+        <div class="banner-bg">
+          <img class="banner-img-web"
+               src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/web%20banner/WPage3.png"
+               alt="" loading="lazy">
+          <img class="banner-img-mobile"
+               src="https://raw.githubusercontent.com/thwayy452/portfolio/main/banners/mobile%20banner/MPage3.png"
+               alt="" loading="lazy">
+        </div>
         <div class="banner-text">
           <h1>Hi, I'm Thwvy.</h1>
           <p>I make <strong>3D designs</strong>, <strong>Graphics</strong>, <strong>Motion</strong> &amp;
@@ -620,16 +670,28 @@
     </div>
   </section>
 
-  <!-- ═══════════ BRANDS ═══════════ -->
+  <!-- ═══════════ BRANDS — MARQUEE ═══════════ -->
   <section class="brands fade-up">
     <p class="brands__label">Brands I worked with</p>
-    <div class="brands__row">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Bata.svg" alt="Bata">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSE.svg" alt="MSE">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/theemailboost.svg" alt="The Email Boost">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/TURSIAN.svg" alt="Tursian">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSH.svg" alt="MSH">
-      <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Oneprintinghouse.svg" alt="One Printing House">
+    <div class="marquee" aria-hidden="true">
+      <!-- Group 1 (original) -->
+      <div class="marquee__group">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Bata.svg" alt="Bata">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSE.svg" alt="MSE">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/theemailboost.svg" alt="The Email Boost">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/TURSIAN.svg" alt="Tursian">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSH.svg" alt="MSH">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Oneprintinghouse.svg" alt="One Printing House">
+      </div>
+      <!-- Group 2 (duplicate for seamless loop) -->
+      <div class="marquee__group">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Bata.svg" alt="Bata">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSE.svg" alt="MSE">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/theemailboost.svg" alt="The Email Boost">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/TURSIAN.svg" alt="Tursian">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/MSH.svg" alt="MSH">
+        <img src="https://raw.githubusercontent.com/thwayy452/portfolio/main/brands/Oneprintinghouse.svg" alt="One Printing House">
+      </div>
     </div>
   </section>
 
