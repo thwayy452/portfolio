@@ -45,7 +45,7 @@
       color: #fff;
     }
     .nav-logo .dot {
-      color: #3b82f6;
+      color: #780606;
     }
     .nav-links { display: flex; align-items: center; gap: 32px; }
     .nav-links a {
@@ -84,14 +84,14 @@
       background: rgba(255,255,255,0.05); color: #fff;
     }
     .nav-cta {
-      background: #22c55e; color: #000 !important;
+      background: #780606; color: #fff !important;
       padding: 8px 20px; border-radius: 20px;
       font-size: 13px; font-weight: 600;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .nav-cta:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 20px rgba(34,197,94,0.3);
+      box-shadow: 0 4px 20px rgba(120,6,6,0.3);
     }
 
     /* Mobile menu toggle */
@@ -222,53 +222,65 @@
       gap: 14px; margin-bottom: 14px;
     }
     .work-card {
-      background: #1a3a2a; border-radius: 20px;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
       padding: 28px; min-height: 230px;
       display: flex; flex-direction: column; justify-content: space-between;
-      border: 1px solid rgba(255,255,255,0.06);
-      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
       cursor: pointer; position: relative; overflow: hidden;
     }
     .work-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      border-color: rgba(255,255,255,0.15);
     }
-    .work-card--light { background: #f5f5f0; }
-    .work-card--muted { background: #e8edf5; }
+    .work-card--light {
+      background: rgba(255,255,255,0.07);
+    }
+    .work-card--muted {
+      background: rgba(255,255,255,0.05);
+    }
     .work-card__badge {
       font-size: 11px; font-weight: 600;
       color: rgba(255,255,255,0.35);
       text-transform: uppercase; letter-spacing: 1.5px;
     }
     .work-card--light .work-card__badge,
-    .work-card--muted .work-card__badge { color: rgba(0,0,0,0.3); }
+    .work-card--muted .work-card__badge { color: rgba(255,255,255,0.3); }
     .work-card__title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: 22px; font-weight: 700; color: #fff;
       margin: 12px 0 8px; line-height: 1.25;
     }
     .work-card--light .work-card__title,
-    .work-card--muted .work-card__title { color: #111; }
+    .work-card--muted .work-card__title { color: #fff; }
     .work-card__desc {
       font-size: 13px; line-height: 1.5;
       color: rgba(255,255,255,0.55);
     }
     .work-card--light .work-card__desc,
-    .work-card--muted .work-card__desc { color: rgba(0,0,0,0.5); }
+    .work-card--muted .work-card__desc { color: rgba(255,255,255,0.5); }
     .work-card__tags { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
     .work-card__tag {
       padding: 6px 14px; border-radius: 20px;
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.06);
       color: #fff; font-size: 12px; font-weight: 500;
     }
 
     /* Full-width feature card */
     .work-feature {
-      background: linear-gradient(135deg, #1a3a2a, #0f2518);
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
       border-radius: 20px; padding: 40px;
       position: relative; overflow: hidden;
-      min-height: 200px; border: 1px solid rgba(255,255,255,0.06);
+      min-height: 200px;
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: border-color 0.3s;
     }
+    .work-feature:hover { border-color: rgba(255,255,255,0.15); }
     .work-feature__wave {
       position: absolute; inset: 0; opacity: 0.08;
       background: repeating-conic-gradient(
@@ -278,7 +290,7 @@
     .work-feature__content { position: relative; z-index: 2; }
     .work-feature__new {
       display: inline-block;
-      background: #22c55e; color: #000;
+      background: #780606; color: #fff;
       padding: 4px 12px; border-radius: 4px;
       font-size: 11px; font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.5px;
@@ -294,9 +306,10 @@
       padding: 10px 22px; border-radius: 20px;
       font-size: 13px; font-weight: 600;
     }
-    .work-feature__btn--primary { background: #22c55e; color: #000; }
+    .work-feature__btn--primary { background: #780606; color: #fff; }
     .work-feature__btn--ghost {
-      background: rgba(255,255,255,0.1); color: #fff;
+      background: rgba(255,255,255,0.06); color: #fff;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     /* ─── BRANDS MARQUEE ─── */
@@ -348,11 +361,17 @@
       border-radius: 20px; padding: 28px;
       min-height: 210px; display: flex; flex-direction: column;
       justify-content: space-between;
-      border: 1px solid rgba(255,255,255,0.06);
-      transition: transform 0.3s;
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
       cursor: pointer; position: relative; overflow: hidden;
     }
-    .project-card:hover { transform: translateY(-4px); }
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,0.15);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
     .project-card__title {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(20px, 3vw, 26px);
@@ -363,8 +382,18 @@
       align-items: flex-end;
     }
     .project-card__link {
-      color: #22c55e; font-size: 13px; font-weight: 600;
-      display: flex; align-items: center; gap: 4px;
+      color: #fff; font-size: 13px; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 10px 20px; border-radius: 24px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      transition: all 0.25s;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+    }
+    .project-card__link:hover {
+      background: #fff; color: #0a0a0a;
+      border-color: #fff;
     }
     .project-card__emoji {
       font-size: clamp(44px, 6vw, 60px); line-height: 1; opacity: 0.55;
@@ -380,7 +409,7 @@
     .stat__number {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(28px, 5vw, 44px);
-      font-weight: 700; color: #22c55e;
+      font-weight: 700; color: #fff;
     }
     .stat__label {
       font-size: 12px; color: rgba(255,255,255,0.35);
@@ -396,7 +425,7 @@
       max-width: 580px; margin: 0 auto; text-align: center;
     }
     .contact__eyebrow {
-      font-size: 12px; font-weight: 600; color: #22c55e;
+      font-size: 12px; font-weight: 600; color: #780606;
       text-transform: uppercase; letter-spacing: 2px;
       margin-bottom: 12px;
     }
@@ -422,39 +451,61 @@
       outline: none; transition: border-color 0.2s;
     }
     .contact input:focus, .contact textarea:focus {
-      border-color: #22c55e;
+      border-color: #780606;
     }
     .contact textarea { resize: vertical; margin-bottom: 16px; }
     .contact-submit {
       width: 100%; padding: 16px; border-radius: 10px;
-      background: linear-gradient(135deg, #22c55e, #16a34a);
+      background: linear-gradient(135deg, #780606, #5a0404);
       color: #fff; font-size: 15px; font-weight: 600;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .contact-submit:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(34,197,94,0.3);
+      box-shadow: 0 8px 32px rgba(120,6,6,0.3);
     }
 
     /* ─── FOOTER ─── */
     .footer {
       border-top: 1px solid rgba(255,255,255,0.06);
-      padding: 32px 24px;
+      padding: 60px 24px 48px;
+      background: #0a0a0a;
     }
     .footer-inner {
       max-width: 1200px; margin: 0 auto;
-      display: flex; justify-content: space-between;
-      align-items: center; flex-wrap: wrap; gap: 16px;
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 0.8fr;
+      gap: clamp(24px, 4vw, 60px);
     }
-    .footer-copy {
-      font-size: 13px; color: rgba(255,255,255,0.25);
+    .footer-brand {
+      font-size: 14px; color: rgba(255,255,255,0.35);
+      line-height: 1.6;
     }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a {
-      font-size: 13px; color: rgba(255,255,255,0.25);
+    .footer-brand strong {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; color: #fff;
+      font-size: 15px;
+    }
+    .footer-brand strong .dot { color: #780606; }
+    .footer-col-title {
+      font-size: 15px; font-weight: 600;
+      color: #780606; margin-bottom: 20px;
+    }
+    .footer-col p, .footer-col a {
+      font-size: 14px; color: rgba(255,255,255,0.55);
+      line-height: 2; display: block;
       transition: color 0.2s;
     }
-    .footer-links a:hover { color: #fff; }
+    .footer-col a:hover { color: #fff; }
+    .footer-col--links a {
+      display: inline-block;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 1px; margin-bottom: 4px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .footer-col--links a:hover {
+      border-color: #fff; color: #fff;
+    }
 
     /* ─── SCROLL ANIMATIONS ─── */
     .fade-up {
@@ -499,7 +550,7 @@
       .nav-dropdown.open .nav-dropdown-menu { display: block; }
 
       /* Banner — swap to mobile images */
-      .banner { aspect-ratio: 9 / 16; max-height: 85vh; }
+      .banner { aspect-ratio: 4 / 3; max-height: 85vh; }
       .banner-slide .banner-img-web { display: none; }
       .banner-slide .banner-img-mobile { display: block; }
       .banner-arrow { width: 36px; height: 36px; font-size: 14px; }
@@ -522,14 +573,19 @@
       /* Marquee slower on mobile */
       .marquee { animation-duration: 18s; }
       .marquee__group img { height: 22px; }
+
+      /* Footer */
+      .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
     }
 
     @media (max-width: 480px) {
-      .banner { aspect-ratio: 9 / 16; max-height: 80vh; }
+      .banner { aspect-ratio: 4 / 3; max-height: 80vh; }
       .banner-text h1 { font-size: 28px; }
       .banner-text p { font-size: 14px; }
-      .footer-inner { flex-direction: column; text-align: center; }
-      .footer-links { flex-wrap: wrap; justify-content: center; }
+      .footer-inner {
+        grid-template-columns: 1fr 1fr;
+        gap: 32px;
+      }
     }
   </style>
 </head>
@@ -538,7 +594,7 @@
   <!-- ═══════════ NAV ═══════════ -->
   <nav class="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">Thwvy<span class="dot">.</span></a>
+      <a href="#home" class="nav-logo">Thwvy<span class="dot">.</span></a>
 
       <button class="nav-burger" id="burger" aria-label="Menu">
         <span></span><span></span><span></span>
@@ -698,35 +754,35 @@
   <!-- ═══════════ PROJECTS ═══════════ -->
   <section class="projects fade-up">
     <div class="projects-grid">
-      <div class="project-card" style="background:linear-gradient(145deg,#1a3a2a,#153022)">
-        <h3 class="project-card__title">Tennis<br>Rackets</h3>
+      <div class="project-card">
+        <h3 class="project-card__title">Brand<br>Identity</h3>
         <div class="project-card__bottom">
           <a href="#" class="project-card__link">↗ LEARN MORE</a>
-          <span class="project-card__emoji">🎾</span>
+          <span class="project-card__emoji">🎨</span>
         </div>
       </div>
 
-      <div class="project-card" style="background:linear-gradient(145deg,#1a2a3a,#152535)">
-        <h3 class="project-card__title">Gym<br>Dumbbells</h3>
+      <div class="project-card">
+        <h3 class="project-card__title">3D<br>Modeling</h3>
         <div class="project-card__bottom">
           <a href="#" class="project-card__link">↗ LEARN MORE</a>
-          <span class="project-card__emoji">🏋️</span>
+          <span class="project-card__emoji">🧊</span>
         </div>
       </div>
 
-      <div class="project-card" style="background:linear-gradient(145deg,#2a3a1a,#223215)">
-        <h3 class="project-card__title">Badminton<br>Balls</h3>
+      <div class="project-card">
+        <h3 class="project-card__title">Motion<br>Graphics</h3>
         <div class="project-card__bottom">
           <a href="#" class="project-card__link">↗ LEARN MORE</a>
-          <span class="project-card__emoji">🏸</span>
+          <span class="project-card__emoji">🎬</span>
         </div>
       </div>
 
-      <div class="project-card" style="background:linear-gradient(145deg,#1a1a2a,#151525)">
-        <h3 class="project-card__title">Boxing<br>Gloves</h3>
+      <div class="project-card">
+        <h3 class="project-card__title">Window<br>Display</h3>
         <div class="project-card__bottom">
           <a href="#" class="project-card__link">↗ LEARN MORE</a>
-          <span class="project-card__emoji">🥊</span>
+          <span class="project-card__emoji">🏬</span>
         </div>
       </div>
     </div>
@@ -770,13 +826,24 @@
   <!-- ═══════════ FOOTER ═══════════ -->
   <footer class="footer">
     <div class="footer-inner">
-      <span class="footer-copy">© 2026 Thwvy. All rights reserved.</span>
-      <div class="footer-links">
+      <div class="footer-brand">
+        All Rights Reserved © <strong>Thwvy<span class="dot">.</span></strong> 2023
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Contact</p>
+        <p>(+95)</p>
+        <p>9975167973</p>
+        <a href="mailto:hello@thwvy.com">hello@thwvy.com</a>
+      </div>
+
+      <div class="footer-col footer-col--links">
+        <p class="footer-col-title">Follow Us</p>
+        <a href="#">Behance</a>
         <a href="#">Instagram</a>
-        <a href="#">TikTok</a>
-        <a href="#">LinkedIn</a>
-        <a href="#">Discord</a>
-        <a href="#">Github</a>
+        <a href="#">Facebook</a>
+        <a href="#">Youtube</a>
+        <a href="#">Linkedin</a>
       </div>
     </div>
   </footer>
@@ -833,6 +900,13 @@
 
     burger.addEventListener('click', () => {
       navLinks.classList.toggle('open');
+    });
+
+    // Logo click — scroll to top & close mobile menu
+    document.querySelector('.nav-logo').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navLinks.classList.remove('open');
     });
 
     // Mobile dropdown toggle
