@@ -190,18 +190,7 @@
       width: 28px; background: #111;
     }
 
-    /* Arrows */
-    .banner-arrow {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      width: 44px; height: 44px; border-radius: 50%;
-      background: rgba(0,0,0,0.25); backdrop-filter: blur(8px);
-      color: #fff; font-size: 18px; z-index: 10;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s;
-    }
-    .banner-arrow:hover { background: rgba(0,0,0,0.55); }
-    .banner-arrow--prev { left: 16px; }
-    .banner-arrow--next { right: 16px; }
+    /* Arrows — removed */
 
     /* ─── ABOUT BLURB ─── */
     .about-blurb {
@@ -553,13 +542,10 @@
       .banner { aspect-ratio: 4 / 3; max-height: 85vh; }
       .banner-slide .banner-img-web { display: none; }
       .banner-slide .banner-img-mobile { display: block; }
-      .banner-arrow { width: 36px; height: 36px; font-size: 14px; }
-      .banner-arrow--prev { left: 8px; }
-      .banner-arrow--next { right: 8px; }
-      .banner-text { padding: 0 24px; }
-      .banner-text h1 { margin-bottom: 14px; }
-      .banner-text p { margin-bottom: 24px; }
-      .banner-text .btn-outline { padding: 12px 24px; font-size: 14px; }
+      .banner-text { padding: 0 24px; max-width: 50%; }
+      .banner-text h1 { font-size: 24px; margin-bottom: 10px; }
+      .banner-text p { font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+      .banner-text .btn-outline { padding: 10px 20px; font-size: 13px; }
 
       /* Grids */
       .work-grid { grid-template-columns: 1fr; }
@@ -575,17 +561,16 @@
       .marquee__group img { height: 22px; }
 
       /* Footer */
-      .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer { padding: 48px 24px 36px; }
+      .footer-inner { grid-template-columns: 1fr; gap: 36px; }
+      .footer-brand { order: 3; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); }
+      .footer-col--links a { display: block; width: fit-content; }
     }
 
     @media (max-width: 480px) {
       .banner { aspect-ratio: 4 / 3; max-height: 80vh; }
-      .banner-text h1 { font-size: 28px; }
-      .banner-text p { font-size: 14px; }
-      .footer-inner {
-        grid-template-columns: 1fr 1fr;
-        gap: 32px;
-      }
+      .banner-text h1 { font-size: 20px; }
+      .banner-text p { font-size: 12px; }
     }
   </style>
 </head>
@@ -660,10 +645,6 @@
           <a href="#work" class="btn-outline">See My Work</a>
         </div>
       </div>
-
-      <!-- Arrows -->
-      <button class="banner-arrow banner-arrow--prev" id="prevBtn">←</button>
-      <button class="banner-arrow banner-arrow--next" id="nextBtn">→</button>
 
       <!-- Dots -->
       <div class="banner-dots" id="bannerDots">
@@ -878,8 +859,6 @@
       timer = setInterval(nextSlide, 5000);
     }
 
-    document.getElementById('nextBtn').addEventListener('click', nextSlide);
-    document.getElementById('prevBtn').addEventListener('click', prevSlide);
     dots.forEach(d => d.addEventListener('click', () => goToSlide(+d.dataset.slide)));
 
     // Touch swipe
