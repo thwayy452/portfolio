@@ -496,6 +496,123 @@
       border-color: #fff; color: #fff;
     }
 
+    /* ─── SHOWCASE SCROLLER ─── */
+    .showcase {
+      position: relative;
+      padding: 80px 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      background: #0a0a0a;
+      border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .showcase-inner {
+      max-width: 1200px; margin: 0 auto;
+      width: 100%; padding: 0 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px; align-items: center;
+    }
+    .showcase-left { position: relative; }
+    .showcase-label {
+      font-size: 11px; font-weight: 600;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase; letter-spacing: 2px;
+      margin-bottom: 24px;
+    }
+    .showcase-list { list-style: none; }
+    .showcase-item {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(24px, 4vw, 44px);
+      font-weight: 700; line-height: 1.2;
+      color: rgba(255,255,255,0.1);
+      padding: 10px 0;
+      cursor: pointer;
+      transition: color 0.4s ease, transform 0.4s ease, padding-left 0.4s ease, text-shadow 0.4s ease;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .showcase-item.active,
+    .showcase-item:hover {
+      color: #fff;
+      padding-left: 16px;
+      text-shadow: 0 0 24px rgba(255,255,255,0.35), 0 0 48px rgba(120,6,6,0.25);
+    }
+    .showcase-item.active::before,
+    .showcase-item:hover::before {
+      content: '';
+      display: inline-block;
+      width: 4px; height: 0.8em;
+      background: #780606;
+      border-radius: 2px;
+      margin-right: 14px;
+      vertical-align: middle;
+      box-shadow: 0 0 12px rgba(120,6,6,0.6);
+    }
+    .showcase-item:hover:not(.active) {
+      color: #fff;
+      text-shadow: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,255,255,0.1);
+    }
+    .showcase-item:active {
+      color: #fff;
+      text-shadow: 0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.2);
+    }
+    .showcase-counter {
+      margin-top: 32px;
+      font-size: 13px; color: rgba(255,255,255,0.3);
+      font-variant-numeric: tabular-nums;
+    }
+    .showcase-counter span { color: #fff; font-weight: 600; }
+    .showcase-progress {
+      width: 120px; height: 2px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 2px;
+      margin-top: 10px; overflow: hidden;
+    }
+    .showcase-progress-bar {
+      height: 100%; background: #780606;
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* Right side — preview frame */
+    .showcase-right {
+      position: relative;
+      height: 420px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .showcase-frame {
+      position: absolute; inset: 0;
+      border-radius: 20px; overflow: hidden;
+      opacity: 0; transform: scale(0.92) translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .showcase-frame.active {
+      opacity: 1; transform: scale(1) translateY(0);
+      box-shadow: 0 0 40px rgba(255,255,255,0.05), 0 0 80px rgba(120,6,6,0.08);
+      border-color: rgba(255,255,255,0.12);
+    }
+    .showcase-frame img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .showcase-frame-placeholder {
+      text-align: center; padding: 40px;
+    }
+    .showcase-frame-placeholder .icon {
+      font-size: 64px; margin-bottom: 16px;
+      display: block;
+    }
+    .showcase-frame-placeholder .label {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.4);
+    }
+
     /* ─── SCROLL ANIMATIONS ─── */
     .fade-up {
       opacity: 0; transform: translateY(36px);
@@ -555,6 +672,13 @@
 
       /* Feature card */
       .work-feature { padding: 28px; }
+
+      /* Showcase */
+      .showcase { padding: 60px 0; }
+      .showcase-inner { grid-template-columns: 1fr; gap: 32px; }
+      .showcase-right { height: 280px; }
+      .showcase-item { font-size: 22px; }
+      .showcase-hint { display: none; }
 
       /* Marquee slower on mobile */
       .marquee { animation-duration: 18s; }
@@ -653,6 +777,69 @@
         <button class="banner-dot" data-slide="2"></button>
       </div>
     </div>
+  </section>
+
+  <!-- ═══════════ SHOWCASE SCROLLER ═══════════ -->
+  <section class="showcase" id="showcase">
+    <div class="showcase-inner">
+      <div class="showcase-left">
+        <p class="showcase-label">What I Do</p>
+        <ul class="showcase-list" id="showcaseList">
+          <li class="showcase-item" data-index="0">Local Design</li>
+          <li class="showcase-item" data-index="1">International Design</li>
+          <li class="showcase-item" data-index="2">3D Design</li>
+          <li class="showcase-item" data-index="3">Motion Design</li>
+          <li class="showcase-item" data-index="4">Social Design</li>
+          <li class="showcase-item" data-index="5">Window Display Design</li>
+        </ul>
+        <div class="showcase-counter">
+          <span id="showcaseNum">00</span> / 06
+        </div>
+        <div class="showcase-progress">
+          <div class="showcase-progress-bar" id="showcaseBar" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="showcase-right" id="showcaseFrames">
+        <div class="showcase-frame" data-frame="0">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">🏠</span>
+            <span class="label">Local Design</span>
+          </div>
+        </div>
+        <div class="showcase-frame" data-frame="1">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">🌏</span>
+            <span class="label">International Design</span>
+          </div>
+        </div>
+        <div class="showcase-frame" data-frame="2">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">🧊</span>
+            <span class="label">3D Design</span>
+          </div>
+        </div>
+        <div class="showcase-frame" data-frame="3">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">🎬</span>
+            <span class="label">Motion Design</span>
+          </div>
+        </div>
+        <div class="showcase-frame" data-frame="4">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">📱</span>
+            <span class="label">Social Design</span>
+          </div>
+        </div>
+        <div class="showcase-frame" data-frame="5">
+          <div class="showcase-frame-placeholder">
+            <span class="icon">🏬</span>
+            <span class="label">Window Display Design</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </section>
 
   <!-- ═══════════ ABOUT BLURB ═══════════ -->
@@ -912,6 +1099,57 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+    // ── Showcase — hover + tap to preview ──
+    (function() {
+      const items  = document.querySelectorAll('.showcase-item');
+      const frames = document.querySelectorAll('.showcase-frame');
+      const numEl  = document.getElementById('showcaseNum');
+      const barEl  = document.getElementById('showcaseBar');
+      const total  = items.length;
+      let active   = -1;
+
+      barEl.style.width = '0%';
+
+      function showFrame(idx) {
+        frames.forEach(f => f.classList.remove('active'));
+        if (idx >= 0) {
+          frames[idx].classList.add('active');
+          numEl.textContent = String(idx + 1).padStart(2, '0');
+          barEl.style.width = ((idx + 1) / total * 100) + '%';
+        } else {
+          numEl.textContent = '00';
+          barEl.style.width = '0%';
+        }
+      }
+
+      items.forEach(item => {
+        const idx = +item.dataset.index;
+
+        // Hover — show frame
+        item.addEventListener('mouseenter', () => showFrame(idx));
+
+        // Leave — revert to clicked item or hide
+        item.addEventListener('mouseleave', () => showFrame(active));
+
+        // Click — lock selection
+        item.addEventListener('click', () => {
+          items.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          active = idx;
+          showFrame(idx);
+        });
+
+        // Touch — same as click
+        item.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          items.forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          active = idx;
+          showFrame(idx);
+        });
+      });
+    })();
   </script>
 
 </body>
